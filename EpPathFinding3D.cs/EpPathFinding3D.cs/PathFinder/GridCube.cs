@@ -1,9 +1,9 @@
 /*! 
-@file GridRect.cs
+@file GridCube.cs
 @author Woong Gyu La a.k.a Chris. <juhgiyo@gmail.com>
 		<http://github.com/juhgiyo/eppathfinding3d.cs>
 @date April 20, 2017
-@brief GridRect Interface
+@brief GridCube Interface
 @version 2.0
 
 @section LICENSE
@@ -32,7 +32,7 @@ THE SOFTWARE.
 
 @section DESCRIPTION
 
-An Interface for the GridRect Struct.
+An Interface for the GridCube Struct.
 
 */
 using System;
@@ -41,7 +41,7 @@ using System.Collections;
 
 namespace EpPathFinding3D.cs
 {
-    public class GridRect
+    public class GridCube
     {
         public int minX;
         public int minY;
@@ -49,7 +49,7 @@ namespace EpPathFinding3D.cs
         public int maxX;
         public int maxY;
         public int maxZ;
-        public GridRect()
+        public GridCube()
         {
             minX = 0;
             minY = 0;
@@ -59,7 +59,7 @@ namespace EpPathFinding3D.cs
             maxZ = 0;
 
         }
-        public GridRect(int iMinX, int iMinY, int iMinZ, int iMaxX, int iMaxY, int iMaxZ)
+        public GridCube(int iMinX, int iMinY, int iMinZ, int iMaxX, int iMaxY, int iMaxZ)
         {
             minX = iMinX;
             minY = iMinY;
@@ -70,7 +70,7 @@ namespace EpPathFinding3D.cs
             maxZ = iMaxZ;
         }
 
-        public GridRect(GridRect b)
+        public GridCube(GridCube b)
         {
             minX = b.minX;
             minY = b.minY;
@@ -88,9 +88,9 @@ namespace EpPathFinding3D.cs
         public override bool Equals(System.Object obj)
         {
             // Unlikely to compare incorrect type so removed for performance
-            //if (!(obj.GetType() == typeof(GridRect)))
+            //if (!(obj.GetType() == typeof(GridCube)))
             //    return false;
-            GridRect p = (GridRect)obj;
+            GridCube p = (GridCube)obj;
             if (ReferenceEquals(null, p))
             {
                 return false;
@@ -99,7 +99,7 @@ namespace EpPathFinding3D.cs
             return (minX == p.minX) && (minY == p.minY) && (minZ == p.minZ) && (maxX == p.maxX) && (maxY == p.maxY) && (maxZ == p.maxZ);
         }
 
-        public bool Equals(GridRect p)
+        public bool Equals(GridCube p)
         {
             if (ReferenceEquals(null, p))
             {
@@ -109,7 +109,7 @@ namespace EpPathFinding3D.cs
             return (minX == p.minX) && (minY == p.minY) && (minZ == p.minZ) && (maxX == p.maxX) && (maxY == p.maxY) && (maxZ == p.maxZ);
         }
 
-        public static bool operator ==(GridRect a, GridRect b)
+        public static bool operator ==(GridCube a, GridCube b)
         {
             // If both are null, or both are same instance, return true.
             if (System.Object.ReferenceEquals(a, b))
@@ -128,12 +128,12 @@ namespace EpPathFinding3D.cs
             return (a.minX == b.minX) && (a.minY == b.minY) && (a.minZ == b.minZ) && (a.maxX == b.maxX) && (a.maxY == b.maxY) && (a.maxZ == b.maxZ);
         }
 
-        public static bool operator !=(GridRect a, GridRect b)
+        public static bool operator !=(GridCube a, GridCube b)
         {
             return !(a == b);
         }
 
-        public GridRect Set(int iMinX, int iMinY, int iMinZ, int iMaxX, int iMaxY, int iMaxZ)
+        public GridCube Set(int iMinX, int iMinY, int iMinZ, int iMaxX, int iMaxY, int iMaxZ)
         {
             this.minX = iMinX;
             this.minY = iMinY;

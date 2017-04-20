@@ -81,11 +81,11 @@ namespace EpPathFinding3D.cs
         }
 
 
-        public PartialGridWPool(NodePool iNodePool, GridRect iGridRect = null)
+        public PartialGridWPool(NodePool iNodePool, GridCube iGridRect = null)
             : base()
         {
             if (iGridRect == null)
-                m_gridRect = new GridRect();
+                m_gridRect = new GridCube();
             else
                 m_gridRect = iGridRect;
             m_nodePool = iNodePool;
@@ -97,7 +97,7 @@ namespace EpPathFinding3D.cs
             m_nodePool = b.m_nodePool;
         }
        
-        public void SetGridRect(GridRect iGridRect)
+        public void SetGridRect(GridCube iGridRect)
         {
             m_gridRect = iGridRect;
         }

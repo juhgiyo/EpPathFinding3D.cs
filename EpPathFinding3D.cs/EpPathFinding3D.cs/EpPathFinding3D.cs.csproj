@@ -47,7 +47,7 @@
     <Compile Include="PathFinder\AStarFinder.cs" />
     <Compile Include="PathFinder\DiagonalMovement.cs" />
     <Compile Include="PathFinder\GridPos.cs" />
-    <Compile Include="PathFinder\GridRect.cs" />
+    <Compile Include="PathFinder\GridCube.cs" />
     <Compile Include="PathFinder\Grid\BaseGrid.cs" />
     <Compile Include="PathFinder\Grid\DynamicGrid.cs" />
     <Compile Include="PathFinder\Grid\DynamicGridWPool.cs" />

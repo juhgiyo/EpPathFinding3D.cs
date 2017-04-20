@@ -91,7 +91,7 @@ namespace EpPathFinding3D.cs
         public DynamicGridWPool(NodePool iNodePool)
             : base()
         {
-            m_gridRect = new GridRect();
+            m_gridRect = new GridCube();
             m_gridRect.minX = 0;
             m_gridRect.minY = 0;
             m_gridRect.maxX = 0;

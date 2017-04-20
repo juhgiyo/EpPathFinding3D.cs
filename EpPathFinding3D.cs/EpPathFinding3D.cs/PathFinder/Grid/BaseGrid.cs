@@ -190,20 +190,20 @@ namespace EpPathFinding3D.cs
 
         public BaseGrid()
         {
-            m_gridRect = new GridRect();
+            m_gridRect = new GridCube();
         }
 
         public BaseGrid(BaseGrid b)
         {
-            m_gridRect = new GridRect(b.m_gridRect);
+            m_gridRect = new GridCube(b.m_gridRect);
             width = b.width;
             length = b.length;
             height = b.height;
 
         }
 
-        protected GridRect m_gridRect;
-        public GridRect gridRect
+        protected GridCube m_gridRect;
+        public GridCube gridRect
         {
             get { return m_gridRect; }
         }
