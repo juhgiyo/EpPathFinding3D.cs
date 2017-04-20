@@ -36,7 +36,7 @@ Basic Usage
 ------------
 The usage and the demo has been made very similar to [PathFinding.js](https://github.com/qiao/PathFinding.js) for ease of usage.  
 
-You first need to build a grid-map. (For example: width 64 and height 32): 
+You first need to build a grid-map. (For example: width 64, length 32 and height 24): 
 
 
 ```c#
