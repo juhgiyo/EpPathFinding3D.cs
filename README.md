@@ -1,7 +1,7 @@
 [![Gratipay][gratipay-image]][gratipay-url]
 EpPathFinding3D.cs
 ================
-#### A 3D jump point search algorithm for grid based games in C# ####
+#### A 3D jump point search algorithm for cube based games in C# ####
 
 In Development (Not completed yet!)
 ===================================
