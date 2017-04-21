@@ -10,7 +10,8 @@ Introduction
 ------------
  Previous project, [EpPathFinding.cs](https://github.com/juhgiyo/EpPathFinding.cs), was started after I was inspired by [PathFinding.js by Xueqiao Xu](https://github.com/qiao/PathFinding.js) and [the article by D. Harabor](http://harablog.wordpress.com/2011/09/07/jump-point-search/).
 It comes along with a demo to show how the agorithm execute as similar to Xueqiao Xu's [Online Demo](http://qiao.github.com/PathFinding.js/visual).
-then I also extended 2D jump point search algorithm [EpPathFinding.cs](https://github.com/juhgiyo/EpPathFinding.cs) into 3D for cube based 3D environment.
+
+Then I also extended 2D jump point search algorithm [EpPathFinding.cs](https://github.com/juhgiyo/EpPathFinding.cs) into 3D for cube based 3D environment.
 
 Unity Integration Guide
 ------------
