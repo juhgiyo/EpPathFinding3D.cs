@@ -175,7 +175,7 @@ namespace EpPathFinding3D.cs
                         fromGrid.x += (dX / Math.Abs(dX));
                         fromGrid.y += (dY / Math.Abs(dY));
                         fromGrid.z += (dZ / Math.Abs(dZ));
-                        consecutiveGridList.Add(fromGrid);
+                        consecutiveGridList.Add(new GridPos(fromGrid));
                     }
                 }
                 else if (dX == 0)  // horizontal move
@@ -183,7 +183,7 @@ namespace EpPathFinding3D.cs
                     while (fromGrid != toGrid)
                     {
                         fromGrid.y += (dY / Math.Abs(dY));
-                        consecutiveGridList.Add(fromGrid);
+                        consecutiveGridList.Add(new GridPos(fromGrid));
                     }
                 }
                 else if ( dY ==0 ) // vertical move
@@ -191,14 +191,14 @@ namespace EpPathFinding3D.cs
                     while (fromGrid != toGrid)
                     {
                         fromGrid.x += (dX / Math.Abs(dX));
-                        consecutiveGridList.Add(fromGrid);
+                        consecutiveGridList.Add(new GridPos(fromGrid));
                     }
                 }else // height move
                 {
                     while (fromGrid != toGrid)
                     {
                         fromGrid.z += (dZ / Math.Abs(dZ));
-                        consecutiveGridList.Add(fromGrid);
+                        consecutiveGridList.Add(new GridPos(fromGrid));
                     }
                 }
             }
