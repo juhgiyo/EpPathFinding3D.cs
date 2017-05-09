@@ -86,7 +86,7 @@ namespace EpPathFinding3D.cs
 #endif
                 {
 #if (UNITY)
-                    if (neighbor.isClosed) break;
+                    if (neighbor.isClosed) continue;
 #else
                     if (neighbor.isClosed) return;
 #endif
