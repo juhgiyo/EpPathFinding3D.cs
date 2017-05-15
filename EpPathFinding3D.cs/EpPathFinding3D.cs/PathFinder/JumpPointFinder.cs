@@ -778,9 +778,11 @@ namespace EpPathFinding3D.cs
             {
                 tPx = tParent.x;
                 tPy = tParent.y;
+                tPz = tParent.z;
                 // get the normalized direction of travel
                 tDx = (tX - tPx) / Math.Max(Math.Abs(tX - tPx), 1);
                 tDy = (tY - tPy) / Math.Max(Math.Abs(tY - tPy), 1);
+                tDz = (tZ - tPz) / Math.Max(Math.Abs(tZ - tPz), 1);
 
                 if (iParam.CrossCorner)
                 {
