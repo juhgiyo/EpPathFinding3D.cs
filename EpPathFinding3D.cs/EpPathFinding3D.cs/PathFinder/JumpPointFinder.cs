@@ -640,50 +640,96 @@ namespace EpPathFinding3D.cs
 
             int tDx = iX - iPx;
             int tDy = iY - iPy;
+            int tDz = iZ - iPz;
             GridPos jx = null;
             GridPos jy = null;
+            GridPos jz = null;
             if (iParam.CrossCorner)
             {
                 // check for forced neighbors
                 // along the diagonal
-                if (tDx != 0 && tDy != 0)
+                if(tDx != 0 && tDy != 0 && tDz != 0)
                 {
-                    if ((iParam.SearchGrid.IsWalkableAt(iX - tDx, iY + tDy) && !iParam.SearchGrid.IsWalkableAt(iX - tDx, iY)) ||
-                        (iParam.SearchGrid.IsWalkableAt(iX + tDx, iY - tDy) && !iParam.SearchGrid.IsWalkableAt(iX, iY - tDy)))
-                    {
-                        return new GridPos(iX, iY, iZ);
-                    }
+
                 }
-                // horizontally/vertically
                 else
                 {
-                    if (tDx != 0)
+                    if (tDx != 0 && tDy != 0)
                     {
-                        // moving along x
-                        if ((iParam.SearchGrid.IsWalkableAt(iX + tDx, iY + 1) && !iParam.SearchGrid.IsWalkableAt(iX, iY + 1)) ||
-                            (iParam.SearchGrid.IsWalkableAt(iX + tDx, iY - 1) && !iParam.SearchGrid.IsWalkableAt(iX, iY - 1)))
+                        if ((iParam.SearchGrid.IsWalkableAt(iX - tDx, iY + tDy, iZ) && !iParam.SearchGrid.IsWalkableAt(iX - tDx, iY, iZ)) ||
+                            (iParam.SearchGrid.IsWalkableAt(iX + tDx, iY - tDy, iZ) && !iParam.SearchGrid.IsWalkableAt(iX, iY - tDy, iZ)) ||
+                            
+                            //(iParam.SearchGrid.IsWalkableAt(iX + tDx, iY + tDy, iZ + 1) && !iParam.SearchGrid.IsWalkableAt(iX, iY, iZ + 1)) ||
+                            //(iParam.SearchGrid.IsWalkableAt(iX + tDx, iY + tDy, iZ - 1) && !iParam.SearchGrid.IsWalkableAt(iX, iY, iZ - 1))
+                           )
                         {
                             return new GridPos(iX, iY, iZ);
                         }
                     }
+                    else if(tDx != 0 && tDz != 0)
+                    {
+
+                    }
+                    else if (tDy !=0 && tDz != 0)
+                    {
+
+                    }
+                    // horizontally/vertically
                     else
                     {
-                        if ((iParam.SearchGrid.IsWalkableAt(iX + 1, iY + tDy) && !iParam.SearchGrid.IsWalkableAt(iX + 1, iY)) ||
-                            (iParam.SearchGrid.IsWalkableAt(iX - 1, iY + tDy) && !iParam.SearchGrid.IsWalkableAt(iX - 1, iY)))
+                        if (tDx != 0)
                         {
-                            return new GridPos(iX, iY, iZ);
+                            // moving along x
+                            if ((iParam.SearchGrid.IsWalkableAt(iX + tDx, iY + 1) && !iParam.SearchGrid.IsWalkableAt(iX, iY + 1)) ||
+                                (iParam.SearchGrid.IsWalkableAt(iX + tDx, iY - 1) && !iParam.SearchGrid.IsWalkableAt(iX, iY - 1)))
+                            {
+                                return new GridPos(iX, iY, iZ);
+                            }
+                        }
+                        else if (tDy != 0)
+                        {
+                            if ((iParam.SearchGrid.IsWalkableAt(iX + 1, iY + tDy) && !iParam.SearchGrid.IsWalkableAt(iX + 1, iY)) ||
+                                (iParam.SearchGrid.IsWalkableAt(iX - 1, iY + tDy) && !iParam.SearchGrid.IsWalkableAt(iX - 1, iY)))
+                            {
+                                return new GridPos(iX, iY, iZ);
+                            }
+                        }
+                        else // tDz != 0
+                        {
+
                         }
                     }
                 }
                 // when moving diagonally, must check for vertical/horizontal jump points
-                if (tDx != 0 && tDy != 0)
+                if(tDx !=0 && tDy !=0 && tDz != 0)
                 {
-                    jx = jump(iParam, iX + tDx, iY, iX, iY);
-                    jy = jump(iParam, iX, iY + tDy, iX, iY);
-                    if (jx != null || jy != null)
-                    {
-                        return new GridPos(iX, iY);
-                    }
+                    if(jump(iParam, iX + tDx, iY, iZ, iX, iY, iZ) != null)
+                        return new GridPos(iX, iY, iZ);
+                    if(jump(iParam, iX, iY + tDy, iZ, iX, iY, iZ) !=null)
+                        return new GridPos(iX, iY, iZ);
+                    if(jump(iParam, iX, iY, iZ + tDz, iX, iY, iZ) !=null)
+                        return new GridPos(iX, iY, iZ);
+                }
+                else if (tDx != 0 && tDy != 0)
+                {
+                    if (jump(iParam, iX + tDx, iY, iZ, iX, iY, iZ) != null)
+                        return new GridPos(iX, iY, iZ);
+                    if (jump(iParam, iX, iY + tDy, iZ, iX, iY, iZ) != null)
+                        return new GridPos(iX, iY, iZ);
+                }
+                else if (tDx != 0 && tDz != 0)
+                {
+                    if (jump(iParam, iX + tDx, iY, iZ, iX, iY, iZ) != null)
+                        return new GridPos(iX, iY, iZ);
+                    if (jump(iParam, iX, iY, iZ + tDz, iX, iY, iZ) != null)
+                        return new GridPos(iX, iY, iZ);
+                }
+                else if (tDy != 0 && tDz != 0)
+                {
+                    if (jump(iParam, iX, iY + tDy, iZ, iX, iY, iZ) != null)
+                        return new GridPos(iX, iY, iZ);
+                    if (jump(iParam, iX, iY, iZ + tDz, iX, iY, iZ) != null)
+                        return new GridPos(iX, iY, iZ);
                 }
 
                 // moving diagonally, must make sure one of the vertical/horizontal
@@ -739,12 +785,10 @@ namespace EpPathFinding3D.cs
                 // when moving diagonally, must check for vertical/horizontal jump points
                 if (tDx != 0 && tDy != 0)
                 {
-                    jx = jump(iParam, iX + tDx, iY, iX, iY);
-                    jy = jump(iParam, iX, iY + tDy, iX, iY);
-                    if (jx != null || jy != null)
-                    {
+                    if(jump(iParam, iX + tDx, iY, iX, iY) != null)
                         return new GridPos(iX, iY, iZ);
-                    }
+                    if(jump(iParam, iX, iY + tDy, iX, iY) !=null)
+                        return new GridPos(iX, iY, iZ);
                 }
 
                 // moving diagonally, must make sure both of the vertical/horizontal
