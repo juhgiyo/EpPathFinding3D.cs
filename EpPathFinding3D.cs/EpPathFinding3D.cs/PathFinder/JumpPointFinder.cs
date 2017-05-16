@@ -641,9 +641,7 @@ namespace EpPathFinding3D.cs
             int tDx = iX - iPx;
             int tDy = iY - iPy;
             int tDz = iZ - iPz;
-            GridPos jx = null;
-            GridPos jy = null;
-            GridPos jz = null;
+
             if (iParam.CrossCorner)
             {
                 // check for forced neighbors
