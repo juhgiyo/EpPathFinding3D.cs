@@ -168,39 +168,30 @@ namespace EpPathFinding3D.cs
                 int dX = toGrid.x - fromGrid.x;
                 int dY = toGrid.y - fromGrid.y;
                 int dZ = toGrid.z - fromGrid.z;
-                if ( (dX != 0 && dY != 0) || (dX !=0 && dZ != 0) || (dY != 0 && dZ != 0)) // diagonal move
+                
+                int nDX = 0;
+                int nDY = 0;
+                int nDZ = 0;
+                if (dX != 0)
                 {
-                    while (fromGrid != toGrid)
-                    {
-                        fromGrid.x += (dX / Math.Abs(dX));
-                        fromGrid.y += (dY / Math.Abs(dY));
-                        fromGrid.z += (dZ / Math.Abs(dZ));
-                        consecutiveGridList.Add(new GridPos(fromGrid));
-                    }
+                    nDX = (dX / Math.Abs(dX));
                 }
-                else if (dX == 0)  // horizontal move
+                if (dY != 0)
                 {
-                    while (fromGrid != toGrid)
-                    {
-                        fromGrid.y += (dY / Math.Abs(dY));
-                        consecutiveGridList.Add(new GridPos(fromGrid));
-                    }
+                    nDY = (dY / Math.Abs(dY));
                 }
-                else if ( dY ==0 ) // vertical move
+                if (dZ != 0)
                 {
-                    while (fromGrid != toGrid)
-                    {
-                        fromGrid.x += (dX / Math.Abs(dX));
-                        consecutiveGridList.Add(new GridPos(fromGrid));
-                    }
-                }else // height move
-                {
-                    while (fromGrid != toGrid)
-                    {
-                        fromGrid.z += (dZ / Math.Abs(dZ));
-                        consecutiveGridList.Add(new GridPos(fromGrid));
-                    }
+                    nDZ = (dZ / Math.Abs(dZ));
                 }
+                while (fromGrid != toGrid)
+                {
+                    fromGrid.x += nDX;
+                    fromGrid.y += nDY;
+                    fromGrid.z += nDZ;
+                    consecutiveGridList.Add(new GridPos(fromGrid));
+                }
+
             }
             return consecutiveGridList;
         }
