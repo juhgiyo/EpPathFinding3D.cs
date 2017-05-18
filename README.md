@@ -3,9 +3,6 @@ EpPathFinding3D.cs
 ================
 #### A 3D jump point search algorithm for cube based games in C# ####
 
-In Development (Not completed yet!)
-===================================
-
 Introduction
 ------------
  Previous project, [EpPathFinding.cs](https://github.com/juhgiyo/EpPathFinding.cs), was started after I was inspired by [PathFinding.js by Xueqiao Xu](https://github.com/qiao/PathFinding.js) and [the article by D. Harabor](http://harablog.wordpress.com/2011/09/07/jump-point-search/).
