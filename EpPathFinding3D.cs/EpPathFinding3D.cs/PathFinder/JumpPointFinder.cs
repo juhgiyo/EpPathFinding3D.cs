@@ -823,51 +823,145 @@ namespace EpPathFinding3D.cs
             {
                 // check for forced neighbors
                 // along the diagonal
-                if (tDx != 0 && tDy != 0)
+                if (tDx != 0 && tDy != 0 && tDz != 0)
                 {
-                    if ((iParam.SearchGrid.IsWalkableAt(iX + tDx, iY + tDy) && iParam.SearchGrid.IsWalkableAt(iX, iY + tDy) && !iParam.SearchGrid.IsWalkableAt(iX + tDx, iY)) ||
-                        (iParam.SearchGrid.IsWalkableAt(iX + tDx, iY + tDy) && iParam.SearchGrid.IsWalkableAt(iX + tDx, iY) && !iParam.SearchGrid.IsWalkableAt(iX, iY + tDy)))
+                    if ((iParam.SearchGrid.IsWalkableAt(iX + tDx, iY + tDy, iZ) && (!iParam.SearchGrid.IsWalkableAt(iX, iY + tDy, iZ) || !iParam.SearchGrid.IsWalkableAt(iX + tDx, iY, iZ))) ||
+                        (iParam.SearchGrid.IsWalkableAt(iX, iY + tDy, iZ + tDz) && (!iParam.SearchGrid.IsWalkableAt(iX, iY + tDy, iZ) || !iParam.SearchGrid.IsWalkableAt(iX, iY, iZ + tDz))) ||
+                        (iParam.SearchGrid.IsWalkableAt(iX+tDx, iY, iZ + tDz) && (!iParam.SearchGrid.IsWalkableAt(iX + tDx, iY, iZ) || !iParam.SearchGrid.IsWalkableAt(iX, iY, iZ + tDz))) ||
+                        (iParam.SearchGrid.IsWalkableAt(iX+tDx, iY +tDy, iZ+tDz) && (!iParam.SearchGrid.IsWalkableAt(iX + tDx, iY, iZ) || !iParam.SearchGrid.IsWalkableAt(iX, iY + tDy, iZ) || !iParam.SearchGrid.IsWalkableAt(iX + tDx, iY + tDy, iZ) || 
+                                                                                    !iParam.SearchGrid.IsWalkableAt(iX, iY + tDy, iZ + tDz) || !iParam.SearchGrid.IsWalkableAt(iX + tDx, iY, iZ+ tDz) || !iParam.SearchGrid.IsWalkableAt(iX, iY, iZ+tDz)))
+                        )
                     {
                         return new GridPos(iX, iY, iZ);
                     }
                 }
-                // horizontally/vertically
                 else
                 {
-                    if (tDx != 0)
+                    if (tDx != 0 && tDy != 0)
                     {
-                        // moving along x
-                        if ((iParam.SearchGrid.IsWalkableAt(iX, iY + 1) && !iParam.SearchGrid.IsWalkableAt(iX - tDx, iY + 1)) ||
-                            (iParam.SearchGrid.IsWalkableAt(iX, iY - 1) && !iParam.SearchGrid.IsWalkableAt(iX - tDx, iY - 1)))
+
+                        if ((iParam.SearchGrid.IsWalkableAt(iX + tDx, iY + tDy, iZ) && (!iParam.SearchGrid.IsWalkableAt(iX, iY + tDy, iZ) || !iParam.SearchGrid.IsWalkableAt(iX + tDx, iY, iZ))) ||
+                            (iParam.SearchGrid.IsWalkableAt(iX, iY, iZ + 1) && (!iParam.SearchGrid.IsWalkableAt(iX - tDx, iY - tDy, iZ + 1) || !iParam.SearchGrid.IsWalkableAt(iX, iY - tDy, iZ + 1) || !iParam.SearchGrid.IsWalkableAt(iX - tDx, iY, iZ + 1))) ||
+                            (iParam.SearchGrid.IsWalkableAt(iX, iY, iZ - 1) && (!iParam.SearchGrid.IsWalkableAt(iX - tDx, iY - tDy, iZ - 1) || !iParam.SearchGrid.IsWalkableAt(iX, iY - tDy, iZ - 1) || !iParam.SearchGrid.IsWalkableAt(iX - tDx, iY, iZ - 1))) )
                         {
                             return new GridPos(iX, iY, iZ);
                         }
                     }
-                    else
+                    else if(tDx !=0 && tDz !=0)
                     {
-                        if ((iParam.SearchGrid.IsWalkableAt(iX + 1, iY) && !iParam.SearchGrid.IsWalkableAt(iX + 1, iY - tDy)) ||
-                            (iParam.SearchGrid.IsWalkableAt(iX - 1, iY) && !iParam.SearchGrid.IsWalkableAt(iX - 1, iY - tDy)))
+                        if ((iParam.SearchGrid.IsWalkableAt(iX + tDx, iY, iZ + tDz) && (!iParam.SearchGrid.IsWalkableAt(iX, iY, iZ + tDz) || !iParam.SearchGrid.IsWalkableAt(iX + tDx, iY, iZ))) ||
+                            (iParam.SearchGrid.IsWalkableAt(iX, iY + 1, iZ) && (!iParam.SearchGrid.IsWalkableAt(iX - tDx, iY + 1 , iZ - tDz) || !iParam.SearchGrid.IsWalkableAt(iX, iY + 1, iZ - tDz) || !iParam.SearchGrid.IsWalkableAt(iX - tDx, iY + 1, iZ))) ||
+                            (iParam.SearchGrid.IsWalkableAt(iX, iY - 1, iZ) && (!iParam.SearchGrid.IsWalkableAt(iX - tDx, iY - 1, iZ - tDz) || !iParam.SearchGrid.IsWalkableAt(iX, iY - 1, iZ - tDz) || !iParam.SearchGrid.IsWalkableAt(iX - tDx, iY - 1, iZ))))
                         {
                             return new GridPos(iX, iY, iZ);
+                        }
+                    }
+                    else if (tDy !=0 && tDz != 0)
+                    {
+                        if ((iParam.SearchGrid.IsWalkableAt(iX, iY + tDy, iZ + tDz) && (!iParam.SearchGrid.IsWalkableAt(iX, iY + tDy, iZ) || !iParam.SearchGrid.IsWalkableAt(iX, iY, iZ + tDz))) ||
+                            (iParam.SearchGrid.IsWalkableAt(iX + 1, iY, iZ) && (!iParam.SearchGrid.IsWalkableAt(iX + 1, iY - tDy, iZ - tDz) || !iParam.SearchGrid.IsWalkableAt(iX + 1, iY - tDy, iZ) || !iParam.SearchGrid.IsWalkableAt(iX + 1 , iY, iZ - tDz))) ||
+                            (iParam.SearchGrid.IsWalkableAt(iX - 1, iY, iZ) && (!iParam.SearchGrid.IsWalkableAt(iX - 1, iY - tDy, iZ - tDz) || !iParam.SearchGrid.IsWalkableAt(iX - 1, iY - tDy, iZ) || !iParam.SearchGrid.IsWalkableAt(iX - 1, iY, iZ - tDz))))
+                        {
+                            return new GridPos(iX, iY, iZ);
+                        }
+                    }
+                    // horizontally/vertically
+                    else
+                    {
+                        if (tDx != 0)
+                        {
+                            // moving along x
+                            if ((iParam.SearchGrid.IsWalkableAt(iX, iY + 1, iZ) && !iParam.SearchGrid.IsWalkableAt(iX - tDx, iY + 1, iZ)) ||
+                                (iParam.SearchGrid.IsWalkableAt(iX, iY - 1, iZ) && !iParam.SearchGrid.IsWalkableAt(iX - tDx, iY - 1, iZ)) ||
+                                (iParam.SearchGrid.IsWalkableAt(iX, iY, iZ - 1) && !iParam.SearchGrid.IsWalkableAt(iX - tDx, iY, iZ - 1)) ||
+                                (iParam.SearchGrid.IsWalkableAt(iX, iY, iZ + 1) && !iParam.SearchGrid.IsWalkableAt(iX - tDx, iY, iZ + 1)) ||
+                                (iParam.SearchGrid.IsWalkableAt(iX, iY + 1, iZ + 1) && (!iParam.SearchGrid.IsWalkableAt(iX - tDx, iY + 1, iZ + 1) || !iParam.SearchGrid.IsWalkableAt(iX - tDx, iY, iZ + 1) || !iParam.SearchGrid.IsWalkableAt(iX - tDx, iY + 1, iZ))) ||
+                                (iParam.SearchGrid.IsWalkableAt(iX, iY - 1, iZ + 1) && (!iParam.SearchGrid.IsWalkableAt(iX - tDx, iY - 1, iZ + 1) || !iParam.SearchGrid.IsWalkableAt(iX - tDx, iY, iZ + 1) || !iParam.SearchGrid.IsWalkableAt(iX - tDx, iY - 1, iZ))) ||
+                                (iParam.SearchGrid.IsWalkableAt(iX, iY + 1, iZ - 1) && (!iParam.SearchGrid.IsWalkableAt(iX - tDx, iY + 1, iZ - 1) || !iParam.SearchGrid.IsWalkableAt(iX - tDx, iY, iZ - 1) || !iParam.SearchGrid.IsWalkableAt(iX - tDx, iY + 1, iZ))) ||
+                                (iParam.SearchGrid.IsWalkableAt(iX, iY - 1, iZ - 1) && (!iParam.SearchGrid.IsWalkableAt(iX - tDx, iY - 1, iZ - 1) || !iParam.SearchGrid.IsWalkableAt(iX - tDx, iY, iZ - 1) || !iParam.SearchGrid.IsWalkableAt(iX - tDx, iY - 1, iZ))))
+                            {
+                                return new GridPos(iX, iY, iZ);
+                            }
+                        }
+                        else if (tDy != 0)
+                        {
+                            if ((iParam.SearchGrid.IsWalkableAt(iX + 1, iY, iZ) && !iParam.SearchGrid.IsWalkableAt(iX + 1, iY - tDy, iZ)) ||
+                                (iParam.SearchGrid.IsWalkableAt(iX - 1, iY, iZ) && !iParam.SearchGrid.IsWalkableAt(iX - 1, iY - tDy, iZ)) ||
+                                (iParam.SearchGrid.IsWalkableAt(iX, iY, iZ - 1) && !iParam.SearchGrid.IsWalkableAt(iX, iY - tDy, iZ - 1)) ||
+                                (iParam.SearchGrid.IsWalkableAt(iX, iY, iZ + 1) && !iParam.SearchGrid.IsWalkableAt(iX, iY - tDy, iZ + 1)) ||
+                                (iParam.SearchGrid.IsWalkableAt(iX + 1, iY, iZ + 1) && (!iParam.SearchGrid.IsWalkableAt(iX + 1, iY - tDy, iZ + 1) || !iParam.SearchGrid.IsWalkableAt(iX, iY - tDy, iZ + 1) || !iParam.SearchGrid.IsWalkableAt(iX + 1, iY - tDy, iZ))) ||
+                                (iParam.SearchGrid.IsWalkableAt(iX - 1, iY, iZ + 1) && (!iParam.SearchGrid.IsWalkableAt(iX - 1, iY - tDy, iZ + 1) || !iParam.SearchGrid.IsWalkableAt(iX, iY - tDy, iZ + 1) || !iParam.SearchGrid.IsWalkableAt(iX - 1, iY - tDy, iZ))) ||
+                                 (iParam.SearchGrid.IsWalkableAt(iX + 1, iY, iZ - 1) && (!iParam.SearchGrid.IsWalkableAt(iX + 1, iY - tDy, iZ - 1) || !iParam.SearchGrid.IsWalkableAt(iX, iY - tDy, iZ - 1) || !iParam.SearchGrid.IsWalkableAt(iX + 1, iY - tDy, iZ))) ||
+                                 (iParam.SearchGrid.IsWalkableAt(iX - 1, iY, iZ - 1) && (!iParam.SearchGrid.IsWalkableAt(iX - 1, iY - tDy, iZ - 1) || !iParam.SearchGrid.IsWalkableAt(iX, iY - tDy, iZ - 1) || !iParam.SearchGrid.IsWalkableAt(iX - 1, iY - tDy, iZ))))
+                            {
+                                return new GridPos(iX, iY, iZ);
+                            }
+                        }
+                        else
+                        {
+                            if ((iParam.SearchGrid.IsWalkableAt(iX, iY + 1, iZ) && !iParam.SearchGrid.IsWalkableAt(iX, iY + 1, iZ - tDz)) ||
+                                (iParam.SearchGrid.IsWalkableAt(iX, iY - 1, iZ) && !iParam.SearchGrid.IsWalkableAt(iX, iY - 1, iZ - tDz)) ||
+                                (iParam.SearchGrid.IsWalkableAt(iX - 1, iY, iZ) && !iParam.SearchGrid.IsWalkableAt(iX - 1, iY, iZ - tDz)) ||
+                                (iParam.SearchGrid.IsWalkableAt(iX + 1, iY, iZ) && !iParam.SearchGrid.IsWalkableAt(iX + 1, iY, iZ - tDz)) ||
+                                (iParam.SearchGrid.IsWalkableAt(iX + 1, iY + 1, iZ) && (!iParam.SearchGrid.IsWalkableAt(iX + 1, iY + 1, iZ - tDz) || !iParam.SearchGrid.IsWalkableAt(iX + 1, iY, iZ - tDz) || !iParam.SearchGrid.IsWalkableAt(iX, iY + 1, iZ - tDz))) ||
+                                (iParam.SearchGrid.IsWalkableAt(iX + 1, iY - 1, iZ) && (!iParam.SearchGrid.IsWalkableAt(iX + 1, iY - 1, iZ - tDz) || !iParam.SearchGrid.IsWalkableAt(iX + 1, iY, iZ - tDz) || !iParam.SearchGrid.IsWalkableAt(iX, iY - 1, iZ - tDz))) ||
+                                (iParam.SearchGrid.IsWalkableAt(iX - 1, iY + 1, iZ) && (!iParam.SearchGrid.IsWalkableAt(iX - 1, iY + 1, iZ - tDz) || !iParam.SearchGrid.IsWalkableAt(iX - 1, iY, iZ - tDz) || !iParam.SearchGrid.IsWalkableAt(iX, iY + 1, iZ - tDz))) ||
+                                (iParam.SearchGrid.IsWalkableAt(iX - 1, iY - 1, iZ) && (!iParam.SearchGrid.IsWalkableAt(iX - 1, iY - 1, iZ - tDz) || !iParam.SearchGrid.IsWalkableAt(iX - 1, iY, iZ - tDz) || !iParam.SearchGrid.IsWalkableAt(iX, iY - 1, iZ - tDz))))
+                            {
+                                return new GridPos(iX, iY, iZ);
+                            }
                         }
                     }
                 }
+                
 
 
                 // when moving diagonally, must check for vertical/horizontal jump points
-                if (tDx != 0 && tDy != 0)
+                if (tDx != 0 && tDy != 0 && tDz != 0)
                 {
-                    if(jump(iParam, iX + tDx, iY, iX, iY) != null)
+                    if (jump(iParam, iX + tDx, iY, iZ, iX, iY, iZ) != null)
                         return new GridPos(iX, iY, iZ);
-                    if(jump(iParam, iX, iY + tDy, iX, iY) !=null)
+                    if (jump(iParam, iX, iY + tDy, iZ, iX, iY, iZ) != null)
+                        return new GridPos(iX, iY, iZ);
+                    if (jump(iParam, iX + tDx, iY + tDy, iZ, iX, iY, iZ) != null)
+                        return new GridPos(iX, iY, iZ);
+
+                    if (jump(iParam, iX, iY, iZ + tDz, iX, iY, iZ) != null)
+                        return new GridPos(iX, iY, iZ);
+                    if (jump(iParam, iX + tDx, iY, iZ + tDz, iX, iY, iZ) != null)
+                        return new GridPos(iX, iY, iZ);
+                    if (jump(iParam, iX, iY + tDy, iZ + tDz, iX, iY, iZ) != null)
+                        return new GridPos(iX, iY, iZ);
+
+                }
+                else if (tDx != 0 && tDy != 0)
+                {
+                    if (jump(iParam, iX + tDx, iY, iZ, iX, iY, iZ) != null)
+                        return new GridPos(iX, iY, iZ);
+                    if (jump(iParam, iX, iY + tDy, iZ, iX, iY, iZ) != null)
+                        return new GridPos(iX, iY, iZ);
+                }
+                else if (tDx != 0 && tDz != 0)
+                {
+                    if (jump(iParam, iX + tDx, iY, iZ, iX, iY, iZ) != null)
+                        return new GridPos(iX, iY, iZ);
+                    if (jump(iParam, iX, iY, iZ + tDz, iX, iY, iZ) != null)
+                        return new GridPos(iX, iY, iZ);
+                }
+                else if (tDy != 0 && tDz != 0)
+                {
+                    if (jump(iParam, iX, iY + tDy, iZ, iX, iY, iZ) != null)
+                        return new GridPos(iX, iY, iZ);
+                    if (jump(iParam, iX, iY, iZ + tDz, iX, iY, iZ) != null)
                         return new GridPos(iX, iY, iZ);
                 }
 
                 // moving diagonally, must make sure both of the vertical/horizontal
                 // neighbors is open to allow the path
-                if (iParam.SearchGrid.IsWalkableAt(iX + tDx, iY) && iParam.SearchGrid.IsWalkableAt(iX, iY + tDy))
+                if (iParam.SearchGrid.IsWalkableAt(iX + tDx, iY, iZ) && iParam.SearchGrid.IsWalkableAt(iX, iY + tDy, iZ) && iParam.SearchGrid.IsWalkableAt(iX + tDx, iY + tDy, iZ) && 
+                    iParam.SearchGrid.IsWalkableAt(iX, iY + tDy, iZ + tDz) && iParam.SearchGrid.IsWalkableAt(iX + tDx, iY, iZ + tDz) && iParam.SearchGrid.IsWalkableAt(iX, iY, iZ + tDz) )
                 {
-                    return jump(iParam, iX + tDx, iY + tDy, iX, iY);
+                    return jump(iParam, iX + tDx, iY + tDy, iZ + tDz, iX, iY, iZ);
                 }
                 else
                 {
