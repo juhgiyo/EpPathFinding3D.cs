@@ -309,9 +309,6 @@ namespace EpPathFinding3D.cs
             public int tDx;
             public int tDy;
             public int tDz;
-            public GridPos jx;
-            public GridPos jy;
-            public GridPos jz;
             public int stage;
             public JumpSnapshot()
             {
@@ -325,9 +322,6 @@ namespace EpPathFinding3D.cs
                 tDx = 0;
                 tDy = 0;
                 tDz = 0;
-                jx = null;
-                jy = null;
-                jz = null;
                 stage = 0;
             }
         }
@@ -369,50 +363,143 @@ namespace EpPathFinding3D.cs
                         currentSnapshot.tDx = currentSnapshot.iX - currentSnapshot.iPx;
                         currentSnapshot.tDy = currentSnapshot.iY - currentSnapshot.iPy;
                         currentSnapshot.tDz = currentSnapshot.iZ - currentSnapshot.iPz;
-                        currentSnapshot.jx = null;
-                        currentSnapshot.jy = null;
-                        currentSnapshot.jz = null;
 
-                        // TODO: Add forced neighbor for z axis
-                        //       All things below here should be fixed for z axis
                         if (iParam.CrossCorner)
                         {
                             // check for forced neighbors
                             // along the diagonal
-                            if (currentSnapshot.tDx != 0 && currentSnapshot.tDy != 0)
+                            if (currentSnapshot.tDx != 0 && currentSnapshot.tDy != 0 && currentSnapshot.tDz != 0)
                             {
-                                if ((iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY + currentSnapshot.tDy) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY)) ||
-                                    (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY - currentSnapshot.tDy) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - currentSnapshot.tDy)))
+                                if ((iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ)) ||
+                                    (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ)) ||
+                                    (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ)) ||
+                                    (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ - currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ - currentSnapshot.tDz)) ||
+                                    (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ - currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ - currentSnapshot.tDz)) ||
+                                    (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ + currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ)) ||
+                                    (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ - currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ - currentSnapshot.tDz)) ||
+                                    (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ - currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ - currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ - currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ)) ||
+                                    (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ - currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ - currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ - currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ)) ||
+                                    (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ + currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ)) ||
+                                    (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ + currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ)) ||
+                                    (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ + currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ)))
                                 {
                                     retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
                                     continue;
                                 }
                             }
-                            // horizontally/vertically
                             else
                             {
-                                if (currentSnapshot.tDx != 0)
+                                if (currentSnapshot.tDx != 0 && currentSnapshot.tDy != 0)
                                 {
-                                    // moving along x
-                                    if ((iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY + 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + 1)) ||
-                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY - 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - 1)))
+                                    if ((iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ + 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + 1)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ + 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + 1)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ + 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + 1)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ + 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ + 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ + 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ + 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ - 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ - 1)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ - 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ - 1)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ - 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ - 1)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ - 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ - 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ - 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ - 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ - 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ - 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ)))
                                     {
                                         retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
                                         continue;
                                     }
                                 }
-                                else
+                                else if (currentSnapshot.tDx != 0 && currentSnapshot.tDz != 0)
                                 {
-                                    if ((iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY + currentSnapshot.tDy) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY)) ||
-                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY + currentSnapshot.tDy) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY)))
+
+                                    if ((iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ - currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ - currentSnapshot.tDz)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + 1, currentSnapshot.iZ + currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + 1, currentSnapshot.iZ)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY + 1, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + 1, currentSnapshot.iZ)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY + 1, currentSnapshot.iZ + currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + 1, currentSnapshot.iZ)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY + 1, currentSnapshot.iZ + currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + 1, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY + 1, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY + 1, currentSnapshot.iZ - currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + 1, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + 1, currentSnapshot.iZ - currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ - currentSnapshot.tDz)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - 1, currentSnapshot.iZ + currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - 1, currentSnapshot.iZ)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY - 1, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - 1, currentSnapshot.iZ)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY - 1, currentSnapshot.iZ + currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - 1, currentSnapshot.iZ)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY - 1, currentSnapshot.iZ + currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - 1, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY - 1, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY - 1, currentSnapshot.iZ - currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - 1, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - 1, currentSnapshot.iZ - currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ - currentSnapshot.tDz)))
                                     {
                                         retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
                                         continue;
+                                    }
+                                }
+                                else if (currentSnapshot.tDy != 0 && currentSnapshot.tDz != 0)
+                                {
+                                    if ((iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ - currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ - currentSnapshot.tDz)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ + currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY, currentSnapshot.iZ)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY, currentSnapshot.iZ)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ + currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY, currentSnapshot.iZ)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ - currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY, currentSnapshot.iZ - currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ - currentSnapshot.tDz)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ + currentSnapshot.tDx) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY, currentSnapshot.iZ)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY, currentSnapshot.iZ)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ + currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY, currentSnapshot.iZ)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ - currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY, currentSnapshot.iZ - currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ - currentSnapshot.tDz)) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ + currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ)))
+                                    {
+                                        retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
+                                        continue;
+                                    }
+                                }
+                                // horizontally/vertically
+                                else
+                                {
+                                    if (currentSnapshot.tDx != 0)
+                                    {
+                                        // moving along x
+                                        if ((iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY + 1, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + 1, currentSnapshot.iZ)) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY - 1, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - 1, currentSnapshot.iZ)) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ + 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + 1)) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY + 1, currentSnapshot.iZ + 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + 1, currentSnapshot.iZ + 1)) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY - 1, currentSnapshot.iZ + 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - 1, currentSnapshot.iZ + 1)) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ - 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ - 1)) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY + 1, currentSnapshot.iZ - 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ - 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + 1, currentSnapshot.iZ - 1)) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY - 1, currentSnapshot.iZ - 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ - 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - 1, currentSnapshot.iZ - 1)))
+                                        {
+                                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
+                                            continue;
+                                        }
+                                    }
+                                    else if (currentSnapshot.tDy != 0)
+                                    {
+                                        if ((iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY, currentSnapshot.iZ)) ||
+                                             (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY, currentSnapshot.iZ)) ||
+                                             (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ + 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + 1)) ||
+                                             (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ + 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY, currentSnapshot.iZ + 1)) ||
+                                             (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ + 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY, currentSnapshot.iZ + 1)) ||
+                                             (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ - 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ - 1)) ||
+                                             (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ - 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ - 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY, currentSnapshot.iZ - 1)) ||
+                                             (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ - 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ - 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY, currentSnapshot.iZ - 1)))
+                                        {
+                                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
+                                            continue;
+                                        }
+                                    }
+                                    else // currentSnapshot.tDz != 0
+                                    {
+                                        if ((iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + 1, currentSnapshot.iZ + currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + 1, currentSnapshot.iZ)) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - 1, currentSnapshot.iZ + currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - 1, currentSnapshot.iZ)) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY, currentSnapshot.iZ)) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY + 1, currentSnapshot.iZ + currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY + 1, currentSnapshot.iZ)) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY - 1, currentSnapshot.iZ + currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY - 1, currentSnapshot.iZ)) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY, currentSnapshot.iZ)) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY + 1, currentSnapshot.iZ + currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY + 1, currentSnapshot.iZ)) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY - 1, currentSnapshot.iZ + currentSnapshot.tDz) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY - 1, currentSnapshot.iZ)))
+                                        {
+                                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
+                                            continue;
+                                        }
                                     }
                                 }
                             }
                             // when moving diagonally, must check for vertical/horizontal jump points
-                            if (currentSnapshot.tDx != 0 && currentSnapshot.tDy != 0)
+                            if (currentSnapshot.tDx != 0 && currentSnapshot.tDy != 0 && currentSnapshot.tDz != 0)
                             {
                                 currentSnapshot.stage = 1;
                                 stack.Push(currentSnapshot);
@@ -420,25 +507,80 @@ namespace EpPathFinding3D.cs
                                 newSnapshot = new JumpSnapshot();
                                 newSnapshot.iX = currentSnapshot.iX + currentSnapshot.tDx;
                                 newSnapshot.iY = currentSnapshot.iY;
+                                newSnapshot.iZ = currentSnapshot.iZ;
                                 newSnapshot.iPx = currentSnapshot.iX;
                                 newSnapshot.iPy = currentSnapshot.iY;
+                                newSnapshot.iPz = currentSnapshot.iZ;
+                                newSnapshot.stage = 0;
+                                stack.Push(newSnapshot);
+                                continue;
+                            }
+                            else if (currentSnapshot.tDx != 0 && currentSnapshot.tDy != 0)
+                            {
+                                currentSnapshot.stage = 6;
+                                stack.Push(currentSnapshot);
+
+                                newSnapshot = new JumpSnapshot();
+                                newSnapshot.iX = currentSnapshot.iX + currentSnapshot.tDx;
+                                newSnapshot.iY = currentSnapshot.iY;
+                                newSnapshot.iZ = currentSnapshot.iZ;
+                                newSnapshot.iPx = currentSnapshot.iX;
+                                newSnapshot.iPy = currentSnapshot.iY;
+                                newSnapshot.iPz = currentSnapshot.iZ;
+                                newSnapshot.stage = 0;
+                                stack.Push(newSnapshot);
+                                continue;
+                            }
+                            else if (currentSnapshot.tDx != 0 && currentSnapshot.tDz != 0)
+                            {
+                                currentSnapshot.stage = 7;
+                                stack.Push(currentSnapshot);
+
+                                newSnapshot = new JumpSnapshot();
+                                newSnapshot.iX = currentSnapshot.iX + currentSnapshot.tDx;
+                                newSnapshot.iY = currentSnapshot.iY;
+                                newSnapshot.iZ = currentSnapshot.iZ;
+                                newSnapshot.iPx = currentSnapshot.iX;
+                                newSnapshot.iPy = currentSnapshot.iY;
+                                newSnapshot.iPz = currentSnapshot.iZ;
+                                newSnapshot.stage = 0;
+                                stack.Push(newSnapshot);
+                                continue;
+                            }
+                            else if (currentSnapshot.tDy != 0 && currentSnapshot.tDz != 0)
+                            {
+                                currentSnapshot.stage = 8;
+                                stack.Push(currentSnapshot);
+
+                                newSnapshot = new JumpSnapshot();
+                                newSnapshot.iX = currentSnapshot.iX;
+                                newSnapshot.iY = currentSnapshot.iY + currentSnapshot.tDy;
+                                newSnapshot.iZ = currentSnapshot.iZ;
+                                newSnapshot.iPx = currentSnapshot.iX;
+                                newSnapshot.iPy = currentSnapshot.iY;
+                                newSnapshot.iPz = currentSnapshot.iZ;
                                 newSnapshot.stage = 0;
                                 stack.Push(newSnapshot);
                                 continue;
                             }
 
-                            // moving diagonally, must make sure one of the vertical/horizontal
+                            // when moving diagonally, must make sure one of the vertical/horizontal
                             // neighbors is open to allow the path
-
-                            // moving diagonally, must make sure one of the vertical/horizontal
-                            // neighbors is open to allow the path
-                            if (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY) || iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy))
+                            if ((iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ)) ||
+                                 (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ)) ||
+                                 (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ + currentSnapshot.tDz) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz)) ||
+                                 (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz)) ||
+                                 (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz)) ||
+                                 (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ + currentSnapshot.tDz))
+                                )
                             {
                                 newSnapshot = new JumpSnapshot();
                                 newSnapshot.iX = currentSnapshot.iX + currentSnapshot.tDx;
                                 newSnapshot.iY = currentSnapshot.iY + currentSnapshot.tDy;
+                                newSnapshot.iZ = currentSnapshot.iZ + currentSnapshot.tDz;
                                 newSnapshot.iPx = currentSnapshot.iX;
                                 newSnapshot.iPy = currentSnapshot.iY;
+                                newSnapshot.iPz = currentSnapshot.iZ;
                                 newSnapshot.stage = 0;
                                 stack.Push(newSnapshot);
                                 continue;
@@ -448,8 +590,10 @@ namespace EpPathFinding3D.cs
                                 newSnapshot = new JumpSnapshot();
                                 newSnapshot.iX = currentSnapshot.iX + currentSnapshot.tDx;
                                 newSnapshot.iY = currentSnapshot.iY + currentSnapshot.tDy;
+                                newSnapshot.iZ = currentSnapshot.iZ + currentSnapshot.tDz;
                                 newSnapshot.iPx = currentSnapshot.iX;
                                 newSnapshot.iPy = currentSnapshot.iY;
+                                newSnapshot.iPz = currentSnapshot.iZ;
                                 newSnapshot.stage = 0;
                                 stack.Push(newSnapshot);
                                 continue;
@@ -459,51 +603,164 @@ namespace EpPathFinding3D.cs
                         {
                             // check for forced neighbors
                             // along the diagonal
-                            if (currentSnapshot.tDx != 0 && currentSnapshot.tDy != 0)
+                            if (currentSnapshot.tDx != 0 && currentSnapshot.tDy != 0 && currentSnapshot.tDz != 0)
                             {
-                                if ((iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY + currentSnapshot.tDy) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY)) ||
-                                    (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY + currentSnapshot.tDy) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy)))
+                                if ((iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ) && (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ))) ||
+                                    (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ + currentSnapshot.tDz) && (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz))) ||
+                                    (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz) && (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz))) ||
+                                    (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ + currentSnapshot.tDz) && (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ) ||
+                                                                                                !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ + currentSnapshot.tDz) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz)))
+                                    )
                                 {
                                     retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
                                     continue;
                                 }
                             }
-                            // horizontally/vertically
                             else
                             {
-                                if (currentSnapshot.tDx != 0)
+                                if (currentSnapshot.tDx != 0 && currentSnapshot.tDy != 0)
                                 {
-                                    // moving along x
-                                    if ((iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY + 1)) ||
-                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY - 1)))
+
+                                    if ((iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ) && (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ))) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + 1) && (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ + 1) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ + 1) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ + 1))) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ - 1) && (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ - 1) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ - 1) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ - 1))))
                                     {
                                         retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
                                         continue;
                                     }
                                 }
-                                else
+                                else if (currentSnapshot.tDx != 0 && currentSnapshot.tDz != 0)
                                 {
-                                    if ((iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY - currentSnapshot.tDy)) ||
-                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY - currentSnapshot.tDy)))
+                                    if ((iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz) && (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ))) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + 1, currentSnapshot.iZ) && (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY + 1, currentSnapshot.iZ - currentSnapshot.tDz) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + 1, currentSnapshot.iZ - currentSnapshot.tDz) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY + 1, currentSnapshot.iZ))) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - 1, currentSnapshot.iZ) && (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY - 1, currentSnapshot.iZ - currentSnapshot.tDz) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - 1, currentSnapshot.iZ - currentSnapshot.tDz) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY - 1, currentSnapshot.iZ))))
                                     {
                                         retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
                                         continue;
+                                    }
+                                }
+                                else if (currentSnapshot.tDy != 0 && currentSnapshot.tDz != 0)
+                                {
+                                    if ((iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ + currentSnapshot.tDz) && (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz))) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY, currentSnapshot.iZ) && (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ - currentSnapshot.tDz) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY, currentSnapshot.iZ - currentSnapshot.tDz))) ||
+                                        (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY, currentSnapshot.iZ) && (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ - currentSnapshot.tDz) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY, currentSnapshot.iZ - currentSnapshot.tDz))))
+                                    {
+                                        retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
+                                        continue;
+                                    }
+                                }
+                                // horizontally/vertically
+                                else
+                                {
+                                    if (currentSnapshot.tDx != 0)
+                                    {
+                                        // moving along x
+                                        if ((iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + 1, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY + 1, currentSnapshot.iZ)) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - 1, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY - 1, currentSnapshot.iZ)) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ - 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ - 1)) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ + 1)) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + 1, currentSnapshot.iZ + 1) && (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY + 1, currentSnapshot.iZ + 1) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ + 1) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY + 1, currentSnapshot.iZ))) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - 1, currentSnapshot.iZ + 1) && (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY - 1, currentSnapshot.iZ + 1) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ + 1) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY - 1, currentSnapshot.iZ))) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + 1, currentSnapshot.iZ - 1) && (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY + 1, currentSnapshot.iZ - 1) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ - 1) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY + 1, currentSnapshot.iZ))) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - 1, currentSnapshot.iZ - 1) && (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY - 1, currentSnapshot.iZ - 1) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ - 1) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - currentSnapshot.tDx, currentSnapshot.iY - 1, currentSnapshot.iZ))))
+                                        {
+                                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
+                                            continue;
+                                        }
+                                    }
+                                    else if (currentSnapshot.tDy != 0)
+                                    {
+                                        if ((iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ)) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ)) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ - 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ - 1)) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + 1) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ + 1)) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY, currentSnapshot.iZ + 1) && (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ + 1) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ + 1) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ))) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY, currentSnapshot.iZ + 1) && (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ + 1) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ + 1) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ))) ||
+                                             (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY, currentSnapshot.iZ - 1) && (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ - 1) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ - 1) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ))) ||
+                                             (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY, currentSnapshot.iZ - 1) && (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ - 1) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ - 1) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY - currentSnapshot.tDy, currentSnapshot.iZ))))
+                                        {
+                                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
+                                            continue;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if ((iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + 1, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + 1, currentSnapshot.iZ - currentSnapshot.tDz)) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - 1, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - 1, currentSnapshot.iZ - currentSnapshot.tDz)) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY, currentSnapshot.iZ - currentSnapshot.tDz)) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY, currentSnapshot.iZ) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY, currentSnapshot.iZ - currentSnapshot.tDz)) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY + 1, currentSnapshot.iZ) && (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY + 1, currentSnapshot.iZ - currentSnapshot.tDz) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY, currentSnapshot.iZ - currentSnapshot.tDz) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + 1, currentSnapshot.iZ - currentSnapshot.tDz))) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY - 1, currentSnapshot.iZ) && (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY - 1, currentSnapshot.iZ - currentSnapshot.tDz) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + 1, currentSnapshot.iY, currentSnapshot.iZ - currentSnapshot.tDz) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - 1, currentSnapshot.iZ - currentSnapshot.tDz))) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY + 1, currentSnapshot.iZ) && (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY + 1, currentSnapshot.iZ - currentSnapshot.tDz) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY, currentSnapshot.iZ - currentSnapshot.tDz) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + 1, currentSnapshot.iZ - currentSnapshot.tDz))) ||
+                                            (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY - 1, currentSnapshot.iZ) && (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY - 1, currentSnapshot.iZ - currentSnapshot.tDz) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX - 1, currentSnapshot.iY, currentSnapshot.iZ - currentSnapshot.tDz) || !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY - 1, currentSnapshot.iZ - currentSnapshot.tDz))))
+                                        {
+                                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
+                                            continue;
+                                        }
                                     }
                                 }
                             }
-
-
                             // when moving diagonally, must check for vertical/horizontal jump points
-                            if (currentSnapshot.tDx != 0 && currentSnapshot.tDy != 0)
+                            if (currentSnapshot.tDx != 0 && currentSnapshot.tDy != 0 && currentSnapshot.tDz != 0)
                             {
-                                currentSnapshot.stage = 3;
+                                currentSnapshot.stage = 10;
                                 stack.Push(currentSnapshot);
 
                                 newSnapshot = new JumpSnapshot();
                                 newSnapshot.iX = currentSnapshot.iX + currentSnapshot.tDx;
                                 newSnapshot.iY = currentSnapshot.iY;
+                                newSnapshot.iZ = currentSnapshot.iZ;
                                 newSnapshot.iPx = currentSnapshot.iX;
                                 newSnapshot.iPy = currentSnapshot.iY;
+                                newSnapshot.iPz = currentSnapshot.iZ;
+                                newSnapshot.stage = 0;
+                                stack.Push(newSnapshot);
+                                continue;
+                            }
+                            else if (currentSnapshot.tDx != 0 && currentSnapshot.tDy != 0)
+                            {
+                                currentSnapshot.stage = 15;
+                                stack.Push(currentSnapshot);
+
+                                newSnapshot = new JumpSnapshot();
+                                newSnapshot.iX = currentSnapshot.iX + currentSnapshot.tDx;
+                                newSnapshot.iY = currentSnapshot.iY;
+                                newSnapshot.iZ = currentSnapshot.iZ;
+                                newSnapshot.iPx = currentSnapshot.iX;
+                                newSnapshot.iPy = currentSnapshot.iY;
+                                newSnapshot.iPz = currentSnapshot.iZ;
+                                newSnapshot.stage = 0;
+                                stack.Push(newSnapshot);
+                                continue;
+                            }
+                            else if (currentSnapshot.tDx != 0 && currentSnapshot.tDz != 0)
+                            {
+                                currentSnapshot.stage = 16;
+                                stack.Push(currentSnapshot);
+
+                                newSnapshot = new JumpSnapshot();
+                                newSnapshot.iX = currentSnapshot.iX + currentSnapshot.tDx;
+                                newSnapshot.iY = currentSnapshot.iY;
+                                newSnapshot.iZ = currentSnapshot.iZ;
+                                newSnapshot.iPx = currentSnapshot.iX;
+                                newSnapshot.iPy = currentSnapshot.iY;
+                                newSnapshot.iPz = currentSnapshot.iZ;
+                                newSnapshot.stage = 0;
+                                stack.Push(newSnapshot);
+                                continue;
+                            }
+                            else if (currentSnapshot.tDy != 0 && currentSnapshot.tDz != 0)
+                            {
+                                currentSnapshot.stage = 17;
+                                stack.Push(currentSnapshot);
+
+                                newSnapshot = new JumpSnapshot();
+                                newSnapshot.iX = currentSnapshot.iX;
+                                newSnapshot.iY = currentSnapshot.iY + currentSnapshot.tDy;
+                                newSnapshot.iZ = currentSnapshot.iZ;
+                                newSnapshot.iPx = currentSnapshot.iX;
+                                newSnapshot.iPy = currentSnapshot.iY;
+                                newSnapshot.iPz = currentSnapshot.iZ;
                                 newSnapshot.stage = 0;
                                 stack.Push(newSnapshot);
                                 continue;
@@ -511,13 +768,16 @@ namespace EpPathFinding3D.cs
 
                             // moving diagonally, must make sure both of the vertical/horizontal
                             // neighbors is open to allow the path
-                            if (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy))
+                            if (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ) &&
+                                iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ + currentSnapshot.tDz) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz))
                             {
                                 newSnapshot = new JumpSnapshot();
                                 newSnapshot.iX = currentSnapshot.iX + currentSnapshot.tDx;
                                 newSnapshot.iY = currentSnapshot.iY + currentSnapshot.tDy;
+                                newSnapshot.iZ = currentSnapshot.iZ + currentSnapshot.tDz;
                                 newSnapshot.iPx = currentSnapshot.iX;
                                 newSnapshot.iPy = currentSnapshot.iY;
+                                newSnapshot.iPz = currentSnapshot.iZ;
                                 newSnapshot.stage = 0;
                                 stack.Push(newSnapshot);
                                 continue;
@@ -526,7 +786,8 @@ namespace EpPathFinding3D.cs
                         retVal = null;
                         break;
                     case 1:
-                        currentSnapshot.jx = retVal;
+                        if (retVal != null)
+                            continue;
 
                         currentSnapshot.stage = 2;
                         stack.Push(currentSnapshot);
@@ -534,28 +795,155 @@ namespace EpPathFinding3D.cs
                         newSnapshot = new JumpSnapshot();
                         newSnapshot.iX = currentSnapshot.iX;
                         newSnapshot.iY = currentSnapshot.iY + currentSnapshot.tDy;
+                        newSnapshot.iZ = currentSnapshot.iZ;
                         newSnapshot.iPx = currentSnapshot.iX;
                         newSnapshot.iPy = currentSnapshot.iY;
+                        newSnapshot.iPz = currentSnapshot.iZ;
                         newSnapshot.stage = 0;
                         stack.Push(newSnapshot);
                         break;
                     case 2:
-                        currentSnapshot.jy = retVal;
-                        if (currentSnapshot.jx != null || currentSnapshot.jy != null)
-                        {
-                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
-                            continue;
-                        }
 
-                        // moving diagonally, must make sure one of the vertical/horizontal
+                        if (retVal != null)
+                            continue;
+
+                        currentSnapshot.stage = 3;
+                        stack.Push(currentSnapshot);
+
+                        newSnapshot = new JumpSnapshot();
+                        newSnapshot.iX = currentSnapshot.iX + currentSnapshot.tDx;
+                        newSnapshot.iY = currentSnapshot.iY + currentSnapshot.tDy;
+                        newSnapshot.iZ = currentSnapshot.iZ;
+                        newSnapshot.iPx = currentSnapshot.iX;
+                        newSnapshot.iPy = currentSnapshot.iY;
+                        newSnapshot.iPz = currentSnapshot.iZ;
+                        newSnapshot.stage = 0;
+                        stack.Push(newSnapshot);
+                        break;
+                    case 3:
+                        if (retVal != null)
+                            continue;
+
+                        currentSnapshot.stage = 4;
+                        stack.Push(currentSnapshot);
+
+                        newSnapshot = new JumpSnapshot();
+                        newSnapshot.iX = currentSnapshot.iX;
+                        newSnapshot.iY = currentSnapshot.iY;
+                        newSnapshot.iZ = currentSnapshot.iZ + currentSnapshot.tDz;
+                        newSnapshot.iPx = currentSnapshot.iX;
+                        newSnapshot.iPy = currentSnapshot.iY;
+                        newSnapshot.iPz = currentSnapshot.iZ;
+                        newSnapshot.stage = 0;
+                        stack.Push(newSnapshot);
+                        break;
+                    case 4:
+                        if (retVal != null)
+                            continue;
+
+                        currentSnapshot.stage = 5;
+                        stack.Push(currentSnapshot);
+
+                        newSnapshot = new JumpSnapshot();
+                        newSnapshot.iX = currentSnapshot.iX + currentSnapshot.tDx;
+                        newSnapshot.iY = currentSnapshot.iY;
+                        newSnapshot.iZ = currentSnapshot.iZ + currentSnapshot.tDz;
+                        newSnapshot.iPx = currentSnapshot.iX;
+                        newSnapshot.iPy = currentSnapshot.iY;
+                        newSnapshot.iPz = currentSnapshot.iZ;
+                        newSnapshot.stage = 0;
+                        stack.Push(newSnapshot);
+                        break;
+                    case 5:
+                        if (retVal != null)
+                            continue;
+
+                        currentSnapshot.stage = 9;
+                        stack.Push(currentSnapshot);
+
+                        newSnapshot = new JumpSnapshot();
+                        newSnapshot.iX = currentSnapshot.iX;
+                        newSnapshot.iY = currentSnapshot.iY + currentSnapshot.tDy;
+                        newSnapshot.iZ = currentSnapshot.iZ + currentSnapshot.tDz;
+                        newSnapshot.iPx = currentSnapshot.iX;
+                        newSnapshot.iPy = currentSnapshot.iY;
+                        newSnapshot.iPz = currentSnapshot.iZ;
+                        newSnapshot.stage = 0;
+                        stack.Push(newSnapshot);
+                        break;
+                    case 6:
+                        if (retVal != null)
+                            continue;
+
+                        currentSnapshot.stage = 9;
+                        stack.Push(currentSnapshot);
+
+                        newSnapshot = new JumpSnapshot();
+                        newSnapshot.iX = currentSnapshot.iX;
+                        newSnapshot.iY = currentSnapshot.iY + currentSnapshot.tDy;
+                        newSnapshot.iZ = currentSnapshot.iZ;
+                        newSnapshot.iPx = currentSnapshot.iX;
+                        newSnapshot.iPy = currentSnapshot.iY;
+                        newSnapshot.iPz = currentSnapshot.iZ;
+                        newSnapshot.stage = 0;
+                        stack.Push(newSnapshot);
+                        break;
+                    case 7:
+                        if (retVal != null)
+                            continue;
+
+                        currentSnapshot.stage = 9;
+                        stack.Push(currentSnapshot);
+
+                        newSnapshot = new JumpSnapshot();
+                        newSnapshot.iX = currentSnapshot.iX;
+                        newSnapshot.iY = currentSnapshot.iY;
+                        newSnapshot.iZ = currentSnapshot.iZ + currentSnapshot.tDz;
+                        newSnapshot.iPx = currentSnapshot.iX;
+                        newSnapshot.iPy = currentSnapshot.iY;
+                        newSnapshot.iPz = currentSnapshot.iZ;
+                        newSnapshot.stage = 0;
+                        stack.Push(newSnapshot);
+                        break;
+                    case 8:
+                        if (retVal != null)
+                            continue;
+
+                        currentSnapshot.stage = 9;
+                        stack.Push(currentSnapshot);
+
+                        newSnapshot = new JumpSnapshot();
+                        newSnapshot.iX = currentSnapshot.iX;
+                        newSnapshot.iY = currentSnapshot.iY;
+                        newSnapshot.iZ = currentSnapshot.iZ + currentSnapshot.tDz;
+                        newSnapshot.iPx = currentSnapshot.iX;
+                        newSnapshot.iPy = currentSnapshot.iY;
+                        newSnapshot.iPz = currentSnapshot.iZ;
+                        newSnapshot.stage = 0;
+                        stack.Push(newSnapshot);
+                        break;
+
+                    case 9:
+                        if (retVal != null)
+                            continue;
+
+                        // when moving diagonally, must check for vertical/horizontal jump points
                         // neighbors is open to allow the path
-                        if (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY) || iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy))
+                        if ((iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ)) ||
+                             (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ)) ||
+                             (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ + currentSnapshot.tDz) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz)) ||
+                             (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz)) ||
+                             (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz)) ||
+                             (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ + currentSnapshot.tDz))
+                            )
                         {
                             newSnapshot = new JumpSnapshot();
                             newSnapshot.iX = currentSnapshot.iX + currentSnapshot.tDx;
                             newSnapshot.iY = currentSnapshot.iY + currentSnapshot.tDy;
+                            newSnapshot.iZ = currentSnapshot.iZ + currentSnapshot.tDz;
                             newSnapshot.iPx = currentSnapshot.iX;
                             newSnapshot.iPy = currentSnapshot.iY;
+                            newSnapshot.iPz = currentSnapshot.iZ;
                             newSnapshot.stage = 0;
                             stack.Push(newSnapshot);
                             continue;
@@ -565,39 +953,164 @@ namespace EpPathFinding3D.cs
                             newSnapshot = new JumpSnapshot();
                             newSnapshot.iX = currentSnapshot.iX + currentSnapshot.tDx;
                             newSnapshot.iY = currentSnapshot.iY + currentSnapshot.tDy;
+                            newSnapshot.iZ = currentSnapshot.iZ + currentSnapshot.tDz;
                             newSnapshot.iPx = currentSnapshot.iX;
                             newSnapshot.iPy = currentSnapshot.iY;
+                            newSnapshot.iPz = currentSnapshot.iZ;
                             newSnapshot.stage = 0;
                             stack.Push(newSnapshot);
                             continue;
                         }
                         retVal = null;
                         break;
-                    case 3:
-                        currentSnapshot.jx = retVal;
 
-                        currentSnapshot.stage = 4;
+                    case 10:
+                        if (retVal != null)
+                            continue;
+
+                        currentSnapshot.stage = 11;
                         stack.Push(currentSnapshot);
 
                         newSnapshot = new JumpSnapshot();
                         newSnapshot.iX = currentSnapshot.iX;
                         newSnapshot.iY = currentSnapshot.iY + currentSnapshot.tDy;
+                        newSnapshot.iZ = currentSnapshot.iZ;
                         newSnapshot.iPx = currentSnapshot.iX;
                         newSnapshot.iPy = currentSnapshot.iY;
+                        newSnapshot.iPz = currentSnapshot.iZ;
                         newSnapshot.stage = 0;
                         stack.Push(newSnapshot);
                         break;
-                    case 4:
-                        currentSnapshot.jy = retVal;
-                        if (currentSnapshot.jx != null || currentSnapshot.jy != null)
-                        {
-                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
+                    case 11:
+
+                        if (retVal != null)
                             continue;
-                        }
+
+                        currentSnapshot.stage = 12;
+                        stack.Push(currentSnapshot);
+
+                        newSnapshot = new JumpSnapshot();
+                        newSnapshot.iX = currentSnapshot.iX + currentSnapshot.tDx;
+                        newSnapshot.iY = currentSnapshot.iY + currentSnapshot.tDy;
+                        newSnapshot.iZ = currentSnapshot.iZ;
+                        newSnapshot.iPx = currentSnapshot.iX;
+                        newSnapshot.iPy = currentSnapshot.iY;
+                        newSnapshot.iPz = currentSnapshot.iZ;
+                        newSnapshot.stage = 0;
+                        stack.Push(newSnapshot);
+                        break;
+                    case 12:
+                        if (retVal != null)
+                            continue;
+
+                        currentSnapshot.stage = 13;
+                        stack.Push(currentSnapshot);
+
+                        newSnapshot = new JumpSnapshot();
+                        newSnapshot.iX = currentSnapshot.iX;
+                        newSnapshot.iY = currentSnapshot.iY;
+                        newSnapshot.iZ = currentSnapshot.iZ + currentSnapshot.tDz;
+                        newSnapshot.iPx = currentSnapshot.iX;
+                        newSnapshot.iPy = currentSnapshot.iY;
+                        newSnapshot.iPz = currentSnapshot.iZ;
+                        newSnapshot.stage = 0;
+                        stack.Push(newSnapshot);
+                        break;
+                    case 13:
+                        if (retVal != null)
+                            continue;
+
+                        currentSnapshot.stage = 14;
+                        stack.Push(currentSnapshot);
+
+                        newSnapshot = new JumpSnapshot();
+                        newSnapshot.iX = currentSnapshot.iX + currentSnapshot.tDx;
+                        newSnapshot.iY = currentSnapshot.iY;
+                        newSnapshot.iZ = currentSnapshot.iZ + currentSnapshot.tDz;
+                        newSnapshot.iPx = currentSnapshot.iX;
+                        newSnapshot.iPy = currentSnapshot.iY;
+                        newSnapshot.iPz = currentSnapshot.iZ;
+                        newSnapshot.stage = 0;
+                        stack.Push(newSnapshot);
+                        break;
+                    case 14:
+                        if (retVal != null)
+                            continue;
+
+                        currentSnapshot.stage = 18;
+                        stack.Push(currentSnapshot);
+
+                        newSnapshot = new JumpSnapshot();
+                        newSnapshot.iX = currentSnapshot.iX;
+                        newSnapshot.iY = currentSnapshot.iY + currentSnapshot.tDy;
+                        newSnapshot.iZ = currentSnapshot.iZ + currentSnapshot.tDz;
+                        newSnapshot.iPx = currentSnapshot.iX;
+                        newSnapshot.iPy = currentSnapshot.iY;
+                        newSnapshot.iPz = currentSnapshot.iZ;
+                        newSnapshot.stage = 0;
+                        stack.Push(newSnapshot);
+                        break;
+                    case 15:
+                        if (retVal != null)
+                            continue;
+
+                        currentSnapshot.stage = 18;
+                        stack.Push(currentSnapshot);
+
+                        newSnapshot = new JumpSnapshot();
+                        newSnapshot.iX = currentSnapshot.iX;
+                        newSnapshot.iY = currentSnapshot.iY + currentSnapshot.tDy;
+                        newSnapshot.iZ = currentSnapshot.iZ;
+                        newSnapshot.iPx = currentSnapshot.iX;
+                        newSnapshot.iPy = currentSnapshot.iY;
+                        newSnapshot.iPz = currentSnapshot.iZ;
+                        newSnapshot.stage = 0;
+                        stack.Push(newSnapshot);
+                        break;
+                    case 16:
+                        if (retVal != null)
+                            continue;
+
+                        currentSnapshot.stage = 18;
+                        stack.Push(currentSnapshot);
+
+                        newSnapshot = new JumpSnapshot();
+                        newSnapshot.iX = currentSnapshot.iX;
+                        newSnapshot.iY = currentSnapshot.iY;
+                        newSnapshot.iZ = currentSnapshot.iZ + currentSnapshot.tDz;
+                        newSnapshot.iPx = currentSnapshot.iX;
+                        newSnapshot.iPy = currentSnapshot.iY;
+                        newSnapshot.iPz = currentSnapshot.iZ;
+                        newSnapshot.stage = 0;
+                        stack.Push(newSnapshot);
+                        break;
+                    case 17:
+                        if (retVal != null)
+                            continue;
+
+                        currentSnapshot.stage = 18;
+                        stack.Push(currentSnapshot);
+
+                        newSnapshot = new JumpSnapshot();
+                        newSnapshot.iX = currentSnapshot.iX;
+                        newSnapshot.iY = currentSnapshot.iY;
+                        newSnapshot.iZ = currentSnapshot.iZ + currentSnapshot.tDz;
+                        newSnapshot.iPx = currentSnapshot.iX;
+                        newSnapshot.iPy = currentSnapshot.iY;
+                        newSnapshot.iPz = currentSnapshot.iZ;
+                        newSnapshot.stage = 0;
+                        stack.Push(newSnapshot);
+                        break;
+
+
+                    case 18:
+                        if (retVal != null)
+                            continue;
 
                         // moving diagonally, must make sure both of the vertical/horizontal
                         // neighbors is open to allow the path
-                        if (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy))
+                        if (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ) &&
+                        iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ + currentSnapshot.tDz) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz))
                         {
                             newSnapshot = new JumpSnapshot();
                             newSnapshot.iX = currentSnapshot.iX + currentSnapshot.tDx;
@@ -616,7 +1129,6 @@ namespace EpPathFinding3D.cs
             }
 
             return retVal;
-
         }
         private static GridPos jump(JumpPointParam iParam, int iX, int iY, int iZ, int iPx, int iPy, int iPz)
         {
