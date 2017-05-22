@@ -753,7 +753,81 @@ namespace EpPathFinding3D.cs
                         }
                         else // if(iParam.DiagonalMovement == DiagonalMovement.Never)
                         {
-                            
+                            if (currentSnapshot.tDx != 0)
+                            {
+                                // moving along x
+                                if (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ))
+                                {
+                                    retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
+                                    continue;
+                                }
+                            }
+                            else if (currentSnapshot.tDy != 0)
+                            {
+                                if (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ))
+                                {
+                                    retVal= new GridPos(iX, iY, iZ);
+                                    continue;
+                                }
+                            }
+                            else // if(currentSnapshot.tDz != 0)
+                            {
+                                if (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz))
+                                {
+                                    retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
+                                    continue;
+                                }
+                            }
+
+                            //  must check for perpendicular jump points
+                            if (currentSnapshot.tDx != 0)
+                            {
+                                currentSnapshot.stage = 19;
+                                stack.Push(currentSnapshot);
+
+                                newSnapshot = new JumpSnapshot();
+                                newSnapshot.iX = currentSnapshot.iX;
+                                newSnapshot.iY = currentSnapshot.iY + 1;
+                                newSnapshot.iZ = currentSnapshot.iZ;
+                                newSnapshot.iPx = currentSnapshot.iX;
+                                newSnapshot.iPy = currentSnapshot.iY;
+                                newSnapshot.iPz = currentSnapshot.iZ;
+                                newSnapshot.stage = 0;
+                                stack.Push(newSnapshot);
+                                continue;
+                            }
+                            else if (currentSnapshot.tDy != 0)
+                            {
+                                currentSnapshot.stage = 22;
+                                stack.Push(currentSnapshot);
+
+                                newSnapshot = new JumpSnapshot();
+                                newSnapshot.iX = currentSnapshot.iX + 1;
+                                newSnapshot.iY = currentSnapshot.iY;
+                                newSnapshot.iZ = currentSnapshot.iZ;
+                                newSnapshot.iPx = currentSnapshot.iX;
+                                newSnapshot.iPy = currentSnapshot.iY;
+                                newSnapshot.iPz = currentSnapshot.iZ;
+                                newSnapshot.stage = 0;
+                                stack.Push(newSnapshot);
+                                continue;
+                            }
+                            else //if(currentSnapshot.tDz !=0)
+                            {
+                                currentSnapshot.stage = 25;
+                                stack.Push(currentSnapshot);
+
+                                newSnapshot = new JumpSnapshot();
+                                newSnapshot.iX = currentSnapshot.iX + 1;
+                                newSnapshot.iY = currentSnapshot.iY;
+                                newSnapshot.iZ = currentSnapshot.iZ;
+                                newSnapshot.iPx = currentSnapshot.iX;
+                                newSnapshot.iPy = currentSnapshot.iY;
+                                newSnapshot.iPz = currentSnapshot.iZ;
+                                newSnapshot.stage = 0;
+                                stack.Push(newSnapshot);
+                                continue;
+                            }
                         }
                         retVal = null;
                         break;
@@ -1083,6 +1157,200 @@ namespace EpPathFinding3D.cs
                         // neighbors is open to allow the path
                         if (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ) &&
                         iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ + currentSnapshot.tDz) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz))
+                        {
+                            newSnapshot = new JumpSnapshot();
+                            newSnapshot.iX = currentSnapshot.iX + currentSnapshot.tDx;
+                            newSnapshot.iY = currentSnapshot.iY + currentSnapshot.tDy;
+                            newSnapshot.iZ = currentSnapshot.iZ + currentSnapshot.tDz;
+                            newSnapshot.iPx = currentSnapshot.iX;
+                            newSnapshot.iPy = currentSnapshot.iY;
+                            newSnapshot.iPz = currentSnapshot.iZ;
+                            newSnapshot.stage = 0;
+                            stack.Push(newSnapshot);
+                            continue;
+                        }
+                        retVal = null;
+                        break;
+
+                    case 19:
+                        if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
+                            continue;
+                        }
+                        currentSnapshot.stage =20;
+                        stack.Push(currentSnapshot);
+
+                        newSnapshot = new JumpSnapshot();
+                        newSnapshot.iX = currentSnapshot.iX;
+                        newSnapshot.iY = currentSnapshot.iY - 1;
+                        newSnapshot.iZ = currentSnapshot.iZ;
+                        newSnapshot.iPx = currentSnapshot.iX;
+                        newSnapshot.iPy = currentSnapshot.iY;
+                        newSnapshot.iPz = currentSnapshot.iZ;
+                        newSnapshot.stage = 0;
+                        stack.Push(newSnapshot);
+                        break;
+                    case 20:
+                        if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
+                            continue;
+                        }
+                        currentSnapshot.stage = 21;
+                        stack.Push(currentSnapshot);
+
+                        newSnapshot = new JumpSnapshot();
+                        newSnapshot.iX = currentSnapshot.iX;
+                        newSnapshot.iY = currentSnapshot.iY;
+                        newSnapshot.iZ = currentSnapshot.iZ + 1;
+                        newSnapshot.iPx = currentSnapshot.iX;
+                        newSnapshot.iPy = currentSnapshot.iY;
+                        newSnapshot.iPz = currentSnapshot.iZ;
+                        newSnapshot.stage = 0;
+                        stack.Push(newSnapshot);
+                        break;
+                    case 21:
+                        if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
+                            continue;
+                        }
+                        currentSnapshot.stage = 28;
+                        stack.Push(currentSnapshot);
+
+                        newSnapshot = new JumpSnapshot();
+                        newSnapshot.iX = currentSnapshot.iX;
+                        newSnapshot.iY = currentSnapshot.iY;
+                        newSnapshot.iZ = currentSnapshot.iZ - 1;
+                        newSnapshot.iPx = currentSnapshot.iX;
+                        newSnapshot.iPy = currentSnapshot.iY;
+                        newSnapshot.iPz = currentSnapshot.iZ;
+                        newSnapshot.stage = 0;
+                        stack.Push(newSnapshot);
+                        break;
+                    case 22:
+                        if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
+                            continue;
+                        }
+                        currentSnapshot.stage = 23;
+                        stack.Push(currentSnapshot);
+
+                        newSnapshot = new JumpSnapshot();
+                        newSnapshot.iX = currentSnapshot.iX - 1;
+                        newSnapshot.iY = currentSnapshot.iY;
+                        newSnapshot.iZ = currentSnapshot.iZ;
+                        newSnapshot.iPx = currentSnapshot.iX;
+                        newSnapshot.iPy = currentSnapshot.iY;
+                        newSnapshot.iPz = currentSnapshot.iZ;
+                        newSnapshot.stage = 0;
+                        stack.Push(newSnapshot);
+                        break;
+                    case 23:
+                        if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
+                            continue;
+                        }
+                        currentSnapshot.stage = 24;
+                        stack.Push(currentSnapshot);
+
+                        newSnapshot = new JumpSnapshot();
+                        newSnapshot.iX = currentSnapshot.iX;
+                        newSnapshot.iY = currentSnapshot.iY;
+                        newSnapshot.iZ = currentSnapshot.iZ + 1;
+                        newSnapshot.iPx = currentSnapshot.iX;
+                        newSnapshot.iPy = currentSnapshot.iY;
+                        newSnapshot.iPz = currentSnapshot.iZ;
+                        newSnapshot.stage = 0;
+                        stack.Push(newSnapshot);
+                        break;
+                    case 24:
+                        if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
+                            continue;
+                        }
+                        currentSnapshot.stage = 28;
+                        stack.Push(currentSnapshot);
+
+                        newSnapshot = new JumpSnapshot();
+                        newSnapshot.iX = currentSnapshot.iX;
+                        newSnapshot.iY = currentSnapshot.iY;
+                        newSnapshot.iZ = currentSnapshot.iZ - 1;
+                        newSnapshot.iPx = currentSnapshot.iX;
+                        newSnapshot.iPy = currentSnapshot.iY;
+                        newSnapshot.iPz = currentSnapshot.iZ;
+                        newSnapshot.stage = 0;
+                        stack.Push(newSnapshot);
+                        break;
+                    case 25:
+                        if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
+                            continue;
+                        }
+                        currentSnapshot.stage = 26;
+                        stack.Push(currentSnapshot);
+
+                        newSnapshot = new JumpSnapshot();
+                        newSnapshot.iX = currentSnapshot.iX - 1;
+                        newSnapshot.iY = currentSnapshot.iY;
+                        newSnapshot.iZ = currentSnapshot.iZ;
+                        newSnapshot.iPx = currentSnapshot.iX;
+                        newSnapshot.iPy = currentSnapshot.iY;
+                        newSnapshot.iPz = currentSnapshot.iZ;
+                        newSnapshot.stage = 0;
+                        stack.Push(newSnapshot);
+                        break;
+                    case 26:
+                        if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
+                            continue;
+                        }
+                        currentSnapshot.stage = 27;
+                        stack.Push(currentSnapshot);
+
+                        newSnapshot = new JumpSnapshot();
+                        newSnapshot.iX = currentSnapshot.iX;
+                        newSnapshot.iY = currentSnapshot.iY + 1;
+                        newSnapshot.iZ = currentSnapshot.iZ;
+                        newSnapshot.iPx = currentSnapshot.iX;
+                        newSnapshot.iPy = currentSnapshot.iY;
+                        newSnapshot.iPz = currentSnapshot.iZ;
+                        newSnapshot.stage = 0;
+                        stack.Push(newSnapshot);
+                        break;
+                    case 27:
+                        if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
+                            continue;
+                        }
+                        currentSnapshot.stage = 28;
+                        stack.Push(currentSnapshot);
+
+                        newSnapshot = new JumpSnapshot();
+                        newSnapshot.iX = currentSnapshot.iX;
+                        newSnapshot.iY = currentSnapshot.iY - 1;
+                        newSnapshot.iZ = currentSnapshot.iZ;
+                        newSnapshot.iPx = currentSnapshot.iX;
+                        newSnapshot.iPy = currentSnapshot.iY;
+                        newSnapshot.iPz = currentSnapshot.iZ;
+                        newSnapshot.stage = 0;
+                        stack.Push(newSnapshot);
+                        break;
+                    case 28:
+                        if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
+                            continue;
+                        }
+                        // keep going
+                        if (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY, currentSnapshot.iZ) || iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ) || iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ + currentSnapshot.tDz))
                         {
                             newSnapshot = new JumpSnapshot();
                             newSnapshot.iX = currentSnapshot.iX + currentSnapshot.tDx;
@@ -1454,7 +1722,61 @@ namespace EpPathFinding3D.cs
             }
             else // if(iParam.DiagonalMovement == DiagonalMovement.Never)
             {
-                return null;
+                if (tDx != 0)
+                {
+                    // moving along x
+                    if (!iParam.SearchGrid.IsWalkableAt(iX + tDx, iY, iZ))
+                    {
+                        return new GridPos(iX, iY, iZ);
+                    }
+                }
+                else if(tDy != 0)
+                {
+                    if (!iParam.SearchGrid.IsWalkableAt(iX, iY + tDy, iZ))
+                    {
+                        return new GridPos(iX, iY, iZ);
+                    }
+                }
+                else // if(tDz != 0)
+                {
+                    if (!iParam.SearchGrid.IsWalkableAt(iX, iY, iZ + tDz))
+                    {
+                        return new GridPos(iX, iY, iZ);
+                    }
+                }
+
+                //  must check for perpendicular jump points
+                if (tDx != 0)
+                {
+                    if (jump(iParam, iX, iY + 1, iZ, iX, iY, iZ) != null) return new GridPos(iX, iY, iZ);
+                    if (jump(iParam, iX, iY - 1, iZ, iX, iY, iZ) != null) return new GridPos(iX, iY, iZ);
+                    if (jump(iParam, iX, iY, iZ + 1, iX, iY, iZ) != null) return new GridPos(iX, iY, iZ);
+                    if (jump(iParam, iX, iY, iZ - 1, iX, iY, iZ) != null) return new GridPos(iX, iY, iZ);
+                }
+                else if(tDy != 0)
+                {
+                    if (jump(iParam, iX + 1, iY, iZ, iX, iY, iZ) != null) return new GridPos(iX, iY, iZ);
+                    if (jump(iParam, iX - 1, iY, iZ, iX, iY, iZ) != null) return new GridPos(iX, iY, iZ);
+                    if (jump(iParam, iX, iY, iZ + 1, iX, iY, iZ) != null) return new GridPos(iX, iY, iZ);
+                    if (jump(iParam, iX, iY, iZ - 1, iX, iY, iZ) != null) return new GridPos(iX, iY, iZ);
+                }
+                else //if(tDz !=0)
+                {
+                    if (jump(iParam, iX + 1, iY, iZ, iX, iY, iZ) != null) return new GridPos(iX, iY, iZ);
+                    if (jump(iParam, iX - 1, iY, iZ, iX, iY, iZ) != null) return new GridPos(iX, iY, iZ);
+                    if (jump(iParam, iX, iY + 1, iZ, iX, iY, iZ) != null) return new GridPos(iX, iY, iZ);
+                    if (jump(iParam, iX, iY - 1, iZ, iX, iY, iZ) != null) return new GridPos(iX, iY, iZ);
+                }
+
+                // keep going
+                if (iParam.SearchGrid.IsWalkableAt(iX + tDx, iY, iZ) || iParam.SearchGrid.IsWalkableAt(iX, iY + tDy, iZ) || iParam.SearchGrid.IsWalkableAt(iX, iY, iZ + tDz))
+                {
+                    return jump(iParam, iX + tDx, iY + tDy, iZ +tDz, iX, iY, iZ);
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 
@@ -3553,9 +3875,82 @@ namespace EpPathFinding3D.cs
                 }
                 else // if(iParam.DiagonalMovement == DiagonalMovement.Never)
                 {
+                    if (tDx != 0)
+                    {
+                        if (iParam.SearchGrid.IsWalkableAt(tX + tDx, tY, tZ))
+                        {
+                            tNeighbors.Add(new GridPos(tX + tDx, tY, tZ));
+                        }
+                        
+                        if (iParam.SearchGrid.IsWalkableAt(tX, tY + 1, tZ))
+                        {
+                            tNeighbors.Add(new GridPos(tX, tY +1, tZ));
+                        }
+                        if (iParam.SearchGrid.IsWalkableAt(tX, tY - 1, tZ))
+                        {
+                            tNeighbors.Add(new GridPos(tX, tY - 1, tZ));
+                        }
+                        
+                        if (iParam.SearchGrid.IsWalkableAt(tX, tY, tZ + 1))
+                        {
+                            tNeighbors.Add(new GridPos(tX, tY, tZ +1));
+                        }
+                        if (iParam.SearchGrid.IsWalkableAt(tX, tY, tZ - 1))
+                        {
+                            tNeighbors.Add(new GridPos(tX, tY, tZ - 1));
+                        }
+                    }
+                    else if (tDy != 0)
+                    {
+                        if (iParam.SearchGrid.IsWalkableAt(tX, tY +tDy, tZ))
+                        {
+                            tNeighbors.Add(new GridPos(tX, tY + tDy, tZ));
+                        }
 
+                        if (iParam.SearchGrid.IsWalkableAt(tX + 1, tY, tZ))
+                        {
+                            tNeighbors.Add(new GridPos(tX + 1, tY, tZ));
+                        }
+                        if (iParam.SearchGrid.IsWalkableAt(tX - 1, tY, tZ))
+                        {
+                            tNeighbors.Add(new GridPos(tX - 1, tY, tZ));
+                        }
+                        
+                        if (iParam.SearchGrid.IsWalkableAt(tX, tY, tZ + 1))
+                        {
+                            tNeighbors.Add(new GridPos(tX, tY, tZ +1));
+                        }
+                        if (iParam.SearchGrid.IsWalkableAt(tX, tY, tZ - 1))
+                        {
+                            tNeighbors.Add(new GridPos(tX, tY, tZ - 1));
+                        }
+                    }
+                    else // if (tDz != 0)
+                    {
+                        if (iParam.SearchGrid.IsWalkableAt(tX, tY, tZ + tDz))
+                        {
+                            tNeighbors.Add(new GridPos(tX, tY, tZ + tDz));
+                        }
+
+                        if (iParam.SearchGrid.IsWalkableAt(tX + 1, tY, tZ))
+                        {
+                            tNeighbors.Add(new GridPos(tX + 1, tY, tZ));
+                        }
+                        if (iParam.SearchGrid.IsWalkableAt(tX - 1, tY, tZ))
+                        {
+                            tNeighbors.Add(new GridPos(tX - 1, tY, tZ));
+                        }
+
+                        if (iParam.SearchGrid.IsWalkableAt(tX, tY + 1, tZ))
+                        {
+                            tNeighbors.Add(new GridPos(tX, tY + 1, tZ));
+                        }
+                        if (iParam.SearchGrid.IsWalkableAt(tX, tY - 1, tZ))
+                        {
+                            tNeighbors.Add(new GridPos(tX, tY - 1, tZ));
+                        }
+                    }
                 }
-
             }
             // return all neighbors
             else
