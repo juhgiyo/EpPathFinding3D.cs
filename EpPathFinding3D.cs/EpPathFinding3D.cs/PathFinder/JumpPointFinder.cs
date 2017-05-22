@@ -48,26 +48,22 @@ namespace EpPathFinding3D.cs
 
     public class JumpPointParam : ParamBase
     {
-
-        public JumpPointParam(BaseGrid iGrid, GridPos iStartPos, GridPos iEndPos, bool iAllowEndNodeUnWalkable = true, bool iCrossCorner = true, bool iCrossAdjacentPoint = true, HeuristicMode iMode = HeuristicMode.EUCLIDEAN)
-            : base(iGrid,iStartPos,iEndPos, iMode)
+ 
+        public JumpPointParam(BaseGrid iGrid, GridPos iStartPos, GridPos iEndPos, bool iAllowEndNodeUnWalkable = true, DiagonalMovement iDiagonalMovement = DiagonalMovement.Always, HeuristicMode iMode = HeuristicMode.EUCLIDEAN)
+            : base(iGrid, iStartPos, iEndPos, iDiagonalMovement, iMode)
         {
 
             m_allowEndNodeUnWalkable = iAllowEndNodeUnWalkable;
-            m_crossAdjacentPoint = iCrossAdjacentPoint;
-            m_crossCorner = iCrossCorner;
             openList = new IntervalHeap<Node>();
 
             m_useRecursive = false;
         }
 
-        public JumpPointParam(BaseGrid iGrid, bool iAllowEndNodeUnWalkable = true, bool iCrossCorner = true, bool iCrossAdjacentPoint = true, HeuristicMode iMode = HeuristicMode.EUCLIDEAN)
-            : base(iGrid, iMode)
+        public JumpPointParam(BaseGrid iGrid, bool iAllowEndNodeUnWalkable = true, DiagonalMovement iDiagonalMovement = DiagonalMovement.Always, HeuristicMode iMode = HeuristicMode.EUCLIDEAN)
+            : base(iGrid, iDiagonalMovement, iMode)
         {
             m_allowEndNodeUnWalkable = iAllowEndNodeUnWalkable;
-            m_crossAdjacentPoint = iCrossAdjacentPoint;
-            m_crossCorner = iCrossCorner;
-            
+
             openList = new IntervalHeap<Node>();
             m_useRecursive = false;
         }
@@ -76,8 +72,6 @@ namespace EpPathFinding3D.cs
         {
             m_heuristic = b.m_heuristic;
             m_allowEndNodeUnWalkable = b.m_allowEndNodeUnWalkable;
-            m_crossAdjacentPoint = b.m_crossAdjacentPoint;
-            m_crossCorner = b.m_crossCorner;
 
             openList = new IntervalHeap<Node>();
             openList.AddAll(b.openList);
@@ -91,30 +85,6 @@ namespace EpPathFinding3D.cs
         {
             openList = new IntervalHeap<Node>();
             //openList.Clear();
-        }
-
-        public bool CrossAdjacentPoint
-        {
-            get
-            {
-                return m_crossCorner && m_crossAdjacentPoint;
-            }
-            set
-            {
-                m_crossAdjacentPoint = value;
-            }
-        }
-
-        public bool CrossCorner
-        {
-            get
-            {
-                return m_crossCorner;
-            }
-            set
-            {
-                m_crossCorner = value;
-            }
         }
 
         public bool AllowEndNodeUnWalkable
@@ -141,8 +111,6 @@ namespace EpPathFinding3D.cs
             }
         }
 
-        protected bool m_crossAdjacentPoint;
-        protected bool m_crossCorner;
         protected bool m_allowEndNodeUnWalkable;
 
         protected bool m_useRecursive;
@@ -364,7 +332,7 @@ namespace EpPathFinding3D.cs
                         currentSnapshot.tDy = currentSnapshot.iY - currentSnapshot.iPy;
                         currentSnapshot.tDz = currentSnapshot.iZ - currentSnapshot.iPz;
 
-                        if (iParam.CrossCorner)
+                        if (iParam.DiagonalMovement == DiagonalMovement.Always || iParam.DiagonalMovement == DiagonalMovement.IfAtLeastOneWalkable)
                         {
                             // check for forced neighbors
                             // along the diagonal
@@ -585,7 +553,7 @@ namespace EpPathFinding3D.cs
                                 stack.Push(newSnapshot);
                                 continue;
                             }
-                            else if (iParam.CrossAdjacentPoint)
+                            else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                             {
                                 newSnapshot = new JumpSnapshot();
                                 newSnapshot.iX = currentSnapshot.iX + currentSnapshot.tDx;
@@ -599,7 +567,7 @@ namespace EpPathFinding3D.cs
                                 continue;
                             }
                         }
-                        else //if (!iParam.CrossCorner)
+                        else if (iParam.DiagonalMovement==DiagonalMovement.OnlyWhenNoObstacles)
                         {
                             // check for forced neighbors
                             // along the diagonal
@@ -783,6 +751,10 @@ namespace EpPathFinding3D.cs
                                 continue;
                             }
                         }
+                        else // if(iParam.DiagonalMovement == DiagonalMovement.Never)
+                        {
+                            
+                        }
                         retVal = null;
                         break;
                     case 1:
@@ -948,7 +920,7 @@ namespace EpPathFinding3D.cs
                             stack.Push(newSnapshot);
                             continue;
                         }
-                        else if (iParam.CrossAdjacentPoint)
+                        else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                         {
                             newSnapshot = new JumpSnapshot();
                             newSnapshot.iX = currentSnapshot.iX + currentSnapshot.tDx;
@@ -1145,7 +1117,7 @@ namespace EpPathFinding3D.cs
             int tDy = iY - iPy;
             int tDz = iZ - iPz;
 
-            if (iParam.CrossCorner)
+            if (iParam.DiagonalMovement == DiagonalMovement.Always || iParam.DiagonalMovement == DiagonalMovement.IfAtLeastOneWalkable)
             {
                 // check for forced neighbors
                 // along the diagonal
@@ -1324,14 +1296,14 @@ namespace EpPathFinding3D.cs
                 {
                     return jump(iParam, iX + tDx, iY + tDy, iZ + tDz, iX, iY, iZ);
                 }
-                else if (iParam.CrossAdjacentPoint)
+                else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                 {
                     return jump(iParam, iX + tDx, iY + tDy, iZ + tDz, iX, iY, iZ);
                 }
                 
                 return null;
             }
-            else //if (!iParam.CrossCorner)
+            else if (iParam.DiagonalMovement == DiagonalMovement.OnlyWhenNoObstacles)
             {
                 // check for forced neighbors
                 // along the diagonal
@@ -1480,13 +1452,16 @@ namespace EpPathFinding3D.cs
                     return null;
                 }
             }
-
+            else // if(iParam.DiagonalMovement == DiagonalMovement.Never)
+            {
+                return null;
+            }
         }
 
         private static List<GridPos> findNeighbors(JumpPointParam iParam, Node iNode)
         {
             Node tParent = (Node)iNode.parent;
-            var diagonalMovement = Util.GetDiagonalMovement(iParam.CrossCorner, iParam.CrossAdjacentPoint);
+            //var diagonalMovement = Util.GetDiagonalMovement(iParam.CrossCorner, iParam.CrossAdjacentPoint);
             int tX = iNode.x;
             int tY = iNode.y;
             int tZ = iNode.z;
@@ -1506,7 +1481,7 @@ namespace EpPathFinding3D.cs
                 tDy = (tY - tPy) / Math.Max(Math.Abs(tY - tPy), 1);
                 tDz = (tZ - tPz) / Math.Max(Math.Abs(tZ - tPz), 1);
 
-                if (iParam.CrossCorner)
+                if (iParam.DiagonalMovement == DiagonalMovement.Always || iParam.DiagonalMovement == DiagonalMovement.IfAtLeastOneWalkable)
                 {
                     // search diagonally
                     if(tDx != 0 && tDy!=0 && tDz != 0)
@@ -1531,7 +1506,7 @@ namespace EpPathFinding3D.cs
                             {
                                 tNeighbors.Add(new GridPos(tX + tDx, tY + tDy, tZ));
                             }
-                            else if (iParam.CrossAdjacentPoint)
+                            else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                             {
                                 tNeighbors.Add(new GridPos(tX + tDx, tY + tDy, tZ));
                             }
@@ -1543,7 +1518,7 @@ namespace EpPathFinding3D.cs
                             {
                                 tNeighbors.Add(new GridPos(tX - tDx, tY + tDy, tZ));
                             }
-                            else if (iParam.CrossAdjacentPoint)
+                            else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                             {
                                 tNeighbors.Add(new GridPos(tX - tDx, tY + tDy, tZ));
                             }
@@ -1555,7 +1530,7 @@ namespace EpPathFinding3D.cs
                             {
                                 tNeighbors.Add(new GridPos(tX + tDx, tY - tDy, tZ));
                             }
-                            else if (iParam.CrossAdjacentPoint)
+                            else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                             {
                                 tNeighbors.Add(new GridPos(tX + tDx, tY - tDy, tZ));
                             }
@@ -1568,7 +1543,7 @@ namespace EpPathFinding3D.cs
                             {
                                 tNeighbors.Add(new GridPos(tX + tDx, tY, tZ+tDz));
                             }
-                            else if (iParam.CrossAdjacentPoint)
+                            else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                             {
                                 tNeighbors.Add(new GridPos(tX + tDx, tY, tZ+tDz));
                             }
@@ -1580,7 +1555,7 @@ namespace EpPathFinding3D.cs
                             {
                                 tNeighbors.Add(new GridPos(tX - tDx, tY, tZ + tDz));
                             }
-                            else if (iParam.CrossAdjacentPoint)
+                            else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                             {
                                 tNeighbors.Add(new GridPos(tX - tDx, tY, tZ + tDz));
                             }
@@ -1592,7 +1567,7 @@ namespace EpPathFinding3D.cs
                             {
                                 tNeighbors.Add(new GridPos(tX + tDx, tY, tZ - tDz));
                             }
-                            else if (iParam.CrossAdjacentPoint)
+                            else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                             {
                                 tNeighbors.Add(new GridPos(tX + tDx, tY, tZ - tDz));
                             }
@@ -1605,7 +1580,7 @@ namespace EpPathFinding3D.cs
                             {
                                 tNeighbors.Add(new GridPos(tX, tY + tDy, tZ + tDz));
                             }
-                            else if (iParam.CrossAdjacentPoint)
+                            else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                             {
                                 tNeighbors.Add(new GridPos(tX, tY + tDy, tZ + tDz));
                             }
@@ -1617,7 +1592,7 @@ namespace EpPathFinding3D.cs
                             {
                                 tNeighbors.Add(new GridPos(tX, tY + tDy, tZ - tDz));
                             }
-                            else if (iParam.CrossAdjacentPoint)
+                            else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                             {
                                 tNeighbors.Add(new GridPos(tX, tY + tDy, tZ - tDz));
                             }
@@ -1629,7 +1604,7 @@ namespace EpPathFinding3D.cs
                             {
                                 tNeighbors.Add(new GridPos(tX, tY - tDy, tZ + tDz));
                             }
-                            else if (iParam.CrossAdjacentPoint)
+                            else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                             {
                                 tNeighbors.Add(new GridPos(tX, tY - tDy, tZ + tDz));
                             }
@@ -1645,7 +1620,7 @@ namespace EpPathFinding3D.cs
                             {
                                 tNeighbors.Add(new GridPos(tX + tDx, tY + tDy, tZ - tDz));
                             }
-                            else if (iParam.CrossAdjacentPoint)
+                            else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                             {
                                 tNeighbors.Add(new GridPos(tX + tDx, tY + tDy, tZ - tDz));
                             }
@@ -1658,7 +1633,7 @@ namespace EpPathFinding3D.cs
                             {
                                 tNeighbors.Add(new GridPos(tX - tDx, tY + tDy, tZ - tDz));
                             }
-                            else if (iParam.CrossAdjacentPoint)
+                            else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                             {
                                 tNeighbors.Add(new GridPos(tX - tDx, tY + tDy, tZ - tDz));
                             }
@@ -1671,7 +1646,7 @@ namespace EpPathFinding3D.cs
                             {
                                 tNeighbors.Add(new GridPos(tX + tDx, tY - tDy, tZ - tDz));
                             }
-                            else if (iParam.CrossAdjacentPoint)
+                            else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                             {
                                 tNeighbors.Add(new GridPos(tX + tDx, tY - tDy, tZ - tDz));
                             }
@@ -1689,7 +1664,7 @@ namespace EpPathFinding3D.cs
                             {
                                 tNeighbors.Add(new GridPos(tX + tDx, tY + tDy, tZ + tDz));
                             }
-                            else if (iParam.CrossAdjacentPoint)
+                            else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                             {
                                 tNeighbors.Add(new GridPos(tX + tDx, tY + tDy, tZ + tDz));
                             }
@@ -1705,7 +1680,7 @@ namespace EpPathFinding3D.cs
                             {
                                 tNeighbors.Add(new GridPos(tX + tDx, tY - tDy, tZ + tDz));
                             }
-                            else if (iParam.CrossAdjacentPoint)
+                            else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                             {
                                 tNeighbors.Add(new GridPos(tX + tDx, tY - tDy, tZ + tDz));
                             }
@@ -1718,7 +1693,7 @@ namespace EpPathFinding3D.cs
                             {
                                 tNeighbors.Add(new GridPos(tX - tDx, tY - tDy, tZ + tDz));
                             }
-                            else if (iParam.CrossAdjacentPoint)
+                            else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                             {
                                 tNeighbors.Add(new GridPos(tX - tDx, tY - tDy, tZ + tDz));
                             }
@@ -1733,7 +1708,7 @@ namespace EpPathFinding3D.cs
                             {
                                 tNeighbors.Add(new GridPos(tX - tDx, tY + tDy, tZ + tDz));
                             }
-                            else if (iParam.CrossAdjacentPoint)
+                            else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                             {
                                 tNeighbors.Add(new GridPos(tX - tDx, tY + tDy, tZ + tDz));
                             }
@@ -1759,7 +1734,7 @@ namespace EpPathFinding3D.cs
                                 {
                                     tNeighbors.Add(new GridPos(tX + tDx, tY + tDy, tZ));
                                 }
-                                else if (iParam.CrossAdjacentPoint)
+                                else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                 {
                                     tNeighbors.Add(new GridPos(tX + tDx, tY + tDy, tZ));
                                 }
@@ -1771,7 +1746,7 @@ namespace EpPathFinding3D.cs
                                 {
                                     tNeighbors.Add(new GridPos(tX - tDx, tY + tDy, tZ));
                                 }
-                                else if (iParam.CrossAdjacentPoint)
+                                else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                 {
                                     tNeighbors.Add(new GridPos(tX - tDx, tY + tDy, tZ));
                                 }
@@ -1783,7 +1758,7 @@ namespace EpPathFinding3D.cs
                                 {
                                     tNeighbors.Add(new GridPos(tX + tDx, tY - tDy, tZ));
                                 }
-                                else if (iParam.CrossAdjacentPoint)
+                                else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                 {
                                     tNeighbors.Add(new GridPos(tX + tDx, tY - tDy, tZ));
                                 }
@@ -1797,7 +1772,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX, tY + tDy, tZ + 1));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX, tY + tDy, tZ + 1));
                                     }
@@ -1808,7 +1783,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX + tDx, tY, tZ + 1));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX + tDx, tY, tZ + 1));
                                     }
@@ -1825,7 +1800,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX + tDx, tY + tDy, tZ + 1));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX + tDx, tY + tDy, tZ + 1));
                                     }
@@ -1839,7 +1814,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX - tDx, tY + tDy, tZ + 1));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX - tDx, tY + tDy, tZ + 1));
                                     }
@@ -1853,7 +1828,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX + tDx, tY - tDy, tZ + 1));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX + tDx, tY - tDy, tZ + 1));
                                     }
@@ -1868,7 +1843,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX, tY + tDy, tZ - 1));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX, tY + tDy, tZ - 1));
                                     }
@@ -1879,7 +1854,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX + tDx, tY, tZ - 1));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX + tDx, tY, tZ - 1));
                                     }
@@ -1896,7 +1871,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX + tDx, tY + tDy, tZ - 1));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX + tDx, tY + tDy, tZ - 1));
                                     }
@@ -1910,7 +1885,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX - tDx, tY + tDy, tZ - 1));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX - tDx, tY + tDy, tZ - 1));
                                     }
@@ -1924,7 +1899,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX + tDx, tY - tDy, tZ - 1));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX + tDx, tY - tDy, tZ - 1));
                                     }
@@ -1949,7 +1924,7 @@ namespace EpPathFinding3D.cs
                                 {
                                     tNeighbors.Add(new GridPos(tX + tDx, tY, tZ + tDz));
                                 }
-                                else if (iParam.CrossAdjacentPoint)
+                                else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                 {
                                     tNeighbors.Add(new GridPos(tX + tDx, tY, tZ + tDz));
                                 }
@@ -1961,7 +1936,7 @@ namespace EpPathFinding3D.cs
                                 {
                                     tNeighbors.Add(new GridPos(tX - tDx, tY, tZ + tDz));
                                 }
-                                else if (iParam.CrossAdjacentPoint)
+                                else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                 {
                                     tNeighbors.Add(new GridPos(tX - tDx, tY, tZ + tDz));
                                 }
@@ -1973,7 +1948,7 @@ namespace EpPathFinding3D.cs
                                 {
                                     tNeighbors.Add(new GridPos(tX + tDx, tY, tZ - tDz));
                                 }
-                                else if (iParam.CrossAdjacentPoint)
+                                else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                 {
                                     tNeighbors.Add(new GridPos(tX + tDx, tY, tZ - tDz));
                                 }
@@ -1987,7 +1962,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX, tY + 1, tZ + tDz));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX, tY + 1, tZ + tDz));
                                     }
@@ -1998,7 +1973,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX + tDx, tY + 1, tZ));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX + tDx, tY + 1, tZ));
                                     }
@@ -2015,7 +1990,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX + tDx, tY + 1, tZ + tDz));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX + tDx, tY + 1, tZ + tDz));
                                     }
@@ -2029,7 +2004,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX - tDx, tY + 1, tZ + tDz));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX - tDx, tY + 1, tZ + tDz));
                                     }
@@ -2043,7 +2018,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX + tDx, tY + 1, tZ - tDz));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX + tDx, tY + 1, tZ - tDz));
                                     }
@@ -2058,7 +2033,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX, tY - 1, tZ + tDz));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX, tY - 1, tZ + tDz));
                                     }
@@ -2069,7 +2044,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX + tDx, tY - 1, tZ));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX + tDx, tY - 1, tZ));
                                     }
@@ -2086,7 +2061,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX + tDx, tY - 1, tZ + tDz));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX + tDx, tY - 1, tZ + tDz));
                                     }
@@ -2100,7 +2075,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX - tDx, tY - 1, tZ + tDz));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX - tDx, tY - 1, tZ + tDz));
                                     }
@@ -2114,7 +2089,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX + tDx, tY - 1, tZ - tDz));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX + tDx, tY - 1, tZ - tDz));
                                     }
@@ -2138,7 +2113,7 @@ namespace EpPathFinding3D.cs
                                 {
                                     tNeighbors.Add(new GridPos(tX, tY + tDy, tZ + tDz));
                                 }
-                                else if (iParam.CrossAdjacentPoint)
+                                else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                 {
                                     tNeighbors.Add(new GridPos(tX, tY + tDy, tZ + tDz));
                                 }
@@ -2150,7 +2125,7 @@ namespace EpPathFinding3D.cs
                                 {
                                     tNeighbors.Add(new GridPos(tX, tY + tDy, tZ - tDz));
                                 }
-                                else if (iParam.CrossAdjacentPoint)
+                                else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                 {
                                     tNeighbors.Add(new GridPos(tX, tY + tDy, tZ - tDz));
                                 }
@@ -2162,7 +2137,7 @@ namespace EpPathFinding3D.cs
                                 {
                                     tNeighbors.Add(new GridPos(tX, tY - tDy, tZ + tDz));
                                 }
-                                else if (iParam.CrossAdjacentPoint)
+                                else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                 {
                                     tNeighbors.Add(new GridPos(tX, tY - tDy, tZ + tDz));
                                 }
@@ -2176,7 +2151,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX + 1, tY + tDy, tZ));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX + 1, tY + tDy, tZ));
                                     }
@@ -2187,7 +2162,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX + 1, tY, tZ + tDz));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX + 1, tY, tZ + tDz));
                                     }
@@ -2204,7 +2179,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX + 1, tY + tDy, tZ + tDz));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX + 1, tY + tDy, tZ + tDz));
                                     }
@@ -2218,7 +2193,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX + 1, tY + tDy, tZ - tDz));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX + 1, tY + tDy, tZ - tDz));
                                     }
@@ -2232,7 +2207,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX + 1, tY - tDy, tZ + tDz));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX + 1, tY - tDy, tZ + tDz));
                                     }
@@ -2247,7 +2222,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX - 1, tY + tDy, tZ));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX - 1, tY + tDy, tZ));
                                     }
@@ -2258,7 +2233,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX - 1, tY, tZ + tDz));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX - 1, tY, tZ + tDz));
                                     }
@@ -2275,7 +2250,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX - 1, tY + tDy, tZ + tDz));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX - 1, tY + tDy, tZ + tDz));
                                     }
@@ -2289,7 +2264,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX - 1, tY + tDy, tZ - tDz));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX - 1, tY + tDy, tZ - tDz));
                                     }
@@ -2303,7 +2278,7 @@ namespace EpPathFinding3D.cs
                                     {
                                         tNeighbors.Add(new GridPos(tX - 1, tY - tDy, tZ + tDz));
                                     }
-                                    else if (iParam.CrossAdjacentPoint)
+                                    else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                     {
                                         tNeighbors.Add(new GridPos(tX - 1, tY - tDy, tZ + tDz));
                                     }
@@ -2330,7 +2305,7 @@ namespace EpPathFinding3D.cs
                                         tNeighbors.Add(new GridPos(tX + tDx, tY - 1, tZ));
                                     }
                                 }
-                                else if (iParam.CrossAdjacentPoint)
+                                else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                 {
                                     if (iParam.SearchGrid.IsWalkableAt(tX + tDx, tY + 1, tZ) && !iParam.SearchGrid.IsWalkableAt(tX, tY + 1, tZ))
                                     {
@@ -2350,7 +2325,7 @@ namespace EpPathFinding3D.cs
                                         {
                                             tNeighbors.Add(new GridPos(tX + tDx, tY, tZ + 1));
                                         }
-                                        else if (iParam.CrossAdjacentPoint)
+                                        else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                         {
                                             tNeighbors.Add(new GridPos(tX + tDx, tY, tZ + 1));
                                         }
@@ -2364,7 +2339,7 @@ namespace EpPathFinding3D.cs
                                         {
                                             tNeighbors.Add(new GridPos(tX + tDx, tY + 1, tZ + 1));
                                         }
-                                        else if (iParam.CrossAdjacentPoint)
+                                        else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                         {
                                             tNeighbors.Add(new GridPos(tX + tDx, tY + 1, tZ + 1));
                                         }   
@@ -2378,7 +2353,7 @@ namespace EpPathFinding3D.cs
                                         {
                                             tNeighbors.Add(new GridPos(tX + tDx, tY - 1, tZ + 1));
                                         }
-                                        else if (iParam.CrossAdjacentPoint)
+                                        else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                         {
                                             tNeighbors.Add(new GridPos(tX + tDx, tY - 1, tZ + 1));
                                         }
@@ -2393,7 +2368,7 @@ namespace EpPathFinding3D.cs
                                         {
                                             tNeighbors.Add(new GridPos(tX + tDx, tY, tZ - 1));
                                         }
-                                        else if (iParam.CrossAdjacentPoint)
+                                        else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                         {
                                             tNeighbors.Add(new GridPos(tX + tDx, tY, tZ - 1));
                                         }
@@ -2407,7 +2382,7 @@ namespace EpPathFinding3D.cs
                                         {
                                             tNeighbors.Add(new GridPos(tX + tDx, tY + 1, tZ - 1));
                                         }
-                                        else if (iParam.CrossAdjacentPoint)
+                                        else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                         {
                                             tNeighbors.Add(new GridPos(tX + tDx, tY + 1, tZ - 1));
                                         }
@@ -2421,7 +2396,7 @@ namespace EpPathFinding3D.cs
                                         {
                                             tNeighbors.Add(new GridPos(tX + tDx, tY - 1, tZ - 1));
                                         }
-                                        else if (iParam.CrossAdjacentPoint)
+                                        else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                         {
                                             tNeighbors.Add(new GridPos(tX + tDx, tY - 1, tZ - 1));
                                         }
@@ -2444,7 +2419,7 @@ namespace EpPathFinding3D.cs
                                         tNeighbors.Add(new GridPos(tX - 1, tY + tDy, tZ));
                                     }
                                 }
-                                else if (iParam.CrossAdjacentPoint)
+                                else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                 {
                                     if (iParam.SearchGrid.IsWalkableAt(tX + 1, tY + tDy, tZ) && !iParam.SearchGrid.IsWalkableAt(tX + 1, tY, tZ))
                                     {
@@ -2464,7 +2439,7 @@ namespace EpPathFinding3D.cs
                                         {
                                             tNeighbors.Add(new GridPos(tX, tY + tDy, tZ + 1));
                                         }
-                                        else if (iParam.CrossAdjacentPoint)
+                                        else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                         {
                                             tNeighbors.Add(new GridPos(tX, tY + tDy, tZ + 1));
                                         }
@@ -2478,7 +2453,7 @@ namespace EpPathFinding3D.cs
                                         {
                                             tNeighbors.Add(new GridPos(tX + 1, tY + tDy, tZ + 1));
                                         }
-                                        else if (iParam.CrossAdjacentPoint)
+                                        else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                         {
                                             tNeighbors.Add(new GridPos(tX + 1, tY + tDy, tZ + 1));
                                         }
@@ -2492,7 +2467,7 @@ namespace EpPathFinding3D.cs
                                         {
                                             tNeighbors.Add(new GridPos(tX - 1, tY + tDy, tZ + 1));
                                         }
-                                        else if (iParam.CrossAdjacentPoint)
+                                        else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                         {
                                             tNeighbors.Add(new GridPos(tX - 1, tY + tDy, tZ + 1));
                                         }
@@ -2507,7 +2482,7 @@ namespace EpPathFinding3D.cs
                                         {
                                             tNeighbors.Add(new GridPos(tX, tY + tDy, tZ - 1));
                                         }
-                                        else if (iParam.CrossAdjacentPoint)
+                                        else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                         {
                                             tNeighbors.Add(new GridPos(tX, tY + tDy, tZ - 1));
                                         }
@@ -2521,7 +2496,7 @@ namespace EpPathFinding3D.cs
                                         {
                                             tNeighbors.Add(new GridPos(tX + 1, tY + tDy, tZ - 1));
                                         }
-                                        else if (iParam.CrossAdjacentPoint)
+                                        else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                         {
                                             tNeighbors.Add(new GridPos(tX + 1, tY + tDy, tZ - 1));
                                         }
@@ -2535,7 +2510,7 @@ namespace EpPathFinding3D.cs
                                         {
                                             tNeighbors.Add(new GridPos(tX - 1, tY + tDy, tZ - 1));
                                         }
-                                        else if (iParam.CrossAdjacentPoint)
+                                        else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                         {
                                             tNeighbors.Add(new GridPos(tX - 1, tY + tDy, tZ - 1));
                                         }
@@ -2558,7 +2533,7 @@ namespace EpPathFinding3D.cs
                                         tNeighbors.Add(new GridPos(tX, tY - 1, tZ + tDz));
                                     }
                                 }
-                                else if (iParam.CrossAdjacentPoint)
+                                else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                 {
                                     if (iParam.SearchGrid.IsWalkableAt(tX, tY + 1, tZ + tDz) && !iParam.SearchGrid.IsWalkableAt(tX, tY + 1, tZ))
                                     {
@@ -2578,7 +2553,7 @@ namespace EpPathFinding3D.cs
                                         {
                                             tNeighbors.Add(new GridPos(tX + 1, tY, tZ + tDz));
                                         }
-                                        else if (iParam.CrossAdjacentPoint)
+                                        else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                         {
                                             tNeighbors.Add(new GridPos(tX + 1, tY, tZ + tDz));
                                         }
@@ -2592,7 +2567,7 @@ namespace EpPathFinding3D.cs
                                         {
                                             tNeighbors.Add(new GridPos(tX + 1, tY + 1, tZ + tDz));
                                         }
-                                        else if (iParam.CrossAdjacentPoint)
+                                        else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                         {
                                             tNeighbors.Add(new GridPos(tX + 1, tY + 1, tZ + tDz));
                                         }
@@ -2606,7 +2581,7 @@ namespace EpPathFinding3D.cs
                                         {
                                             tNeighbors.Add(new GridPos(tX + 1, tY - 1, tZ + tDz));
                                         }
-                                        else if (iParam.CrossAdjacentPoint)
+                                        else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                         {
                                             tNeighbors.Add(new GridPos(tX + 1, tY - 1, tZ + tDz));
                                         }
@@ -2621,7 +2596,7 @@ namespace EpPathFinding3D.cs
                                         {
                                             tNeighbors.Add(new GridPos(tX - 1, tY, tZ + tDz));
                                         }
-                                        else if (iParam.CrossAdjacentPoint)
+                                        else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                         {
                                             tNeighbors.Add(new GridPos(tX - 1, tY, tZ + tDz));
                                         }
@@ -2635,7 +2610,7 @@ namespace EpPathFinding3D.cs
                                         {
                                             tNeighbors.Add(new GridPos(tX - 1, tY + 1, tZ + tDz));
                                         }
-                                        else if (iParam.CrossAdjacentPoint)
+                                        else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                         {
                                             tNeighbors.Add(new GridPos(tX - 1, tY + 1, tZ + tDz));
                                         }
@@ -2649,7 +2624,7 @@ namespace EpPathFinding3D.cs
                                         {
                                             tNeighbors.Add(new GridPos(tX - 1, tY - 1, tZ + tDz));
                                         }
-                                        else if (iParam.CrossAdjacentPoint)
+                                        else if (iParam.DiagonalMovement == DiagonalMovement.Always)
                                         {
                                             tNeighbors.Add(new GridPos(tX - 1, tY - 1, tZ + tDz));
                                         }
@@ -2660,7 +2635,7 @@ namespace EpPathFinding3D.cs
                     }
                  
                 }
-                else // if(!iParam.CrossCorner)
+                else if (iParam.DiagonalMovement == DiagonalMovement.OnlyWhenNoObstacles)
                 {
                     // search diagonally
                     if (tDx != 0 && tDy != 0 && tDz != 0)
@@ -3576,12 +3551,16 @@ namespace EpPathFinding3D.cs
                     }
 
                 }
+                else // if(iParam.DiagonalMovement == DiagonalMovement.Never)
+                {
+
+                }
 
             }
             // return all neighbors
             else
             {
-                tNeighborNodes = iParam.SearchGrid.GetNeighbors(iNode, diagonalMovement);
+                tNeighborNodes = iParam.SearchGrid.GetNeighbors(iNode, iParam.DiagonalMovement);
                 for (int i = 0; i < tNeighborNodes.Count; i++)
                 {
                     tNeighborNode = tNeighborNodes[i];

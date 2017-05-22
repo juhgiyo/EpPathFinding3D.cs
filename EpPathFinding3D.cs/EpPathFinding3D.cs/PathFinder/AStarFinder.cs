@@ -15,13 +15,19 @@ namespace EpPathFinding3D.cs
     {
         public delegate float HeuristicDelegate(int iDx, int iDy);
 
-        public DiagonalMovement DiagonalMovement;
+
         public float Weight;
 
-        public AStarParam(BaseGrid iGrid, float iweight, HeuristicMode iMode = HeuristicMode.EUCLIDEAN, DiagonalMovement iDiagonalMovement = DiagonalMovement.Always) : base(iGrid, iMode)
+        public AStarParam(BaseGrid iGrid, GridPos iStartPos, GridPos iEndPos, float iweight, DiagonalMovement iDiagonalMovement = DiagonalMovement.Always, HeuristicMode iMode = HeuristicMode.EUCLIDEAN)
+            : base(iGrid, iStartPos, iEndPos, iDiagonalMovement, iMode)
         {
             Weight = iweight;
-            DiagonalMovement = iDiagonalMovement;
+        }
+
+        public AStarParam(BaseGrid iGrid, float iweight, DiagonalMovement iDiagonalMovement = DiagonalMovement.Always, HeuristicMode iMode = HeuristicMode.EUCLIDEAN)
+            : base(iGrid, iDiagonalMovement, iMode)
+        {
+            Weight = iweight;
         }
 
         internal override void _reset(GridPos iStartPos, GridPos iEndPos, BaseGrid iSearchGrid = null)
