@@ -567,7 +567,7 @@ namespace EpPathFinding3D.cs
                                 continue;
                             }
                         }
-                        else if (iParam.DiagonalMovement==DiagonalMovement.OnlyWhenNoObstacles)
+                        else if (iParam.DiagonalMovement == DiagonalMovement.OnlyWhenNoObstacles)
                         {
                             // check for forced neighbors
                             // along the diagonal
@@ -766,7 +766,7 @@ namespace EpPathFinding3D.cs
                             {
                                 if (!iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy, currentSnapshot.iZ))
                                 {
-                                    retVal= new GridPos(iX, iY, iZ);
+                                    retVal = new GridPos(iX, iY, iZ);
                                     continue;
                                 }
                             }
@@ -833,7 +833,10 @@ namespace EpPathFinding3D.cs
                         break;
                     case 1:
                         if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
                             continue;
+                        }
 
                         currentSnapshot.stage = 2;
                         stack.Push(currentSnapshot);
@@ -851,7 +854,10 @@ namespace EpPathFinding3D.cs
                     case 2:
 
                         if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
                             continue;
+                        }
 
                         currentSnapshot.stage = 3;
                         stack.Push(currentSnapshot);
@@ -868,7 +874,10 @@ namespace EpPathFinding3D.cs
                         break;
                     case 3:
                         if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
                             continue;
+                        }
 
                         currentSnapshot.stage = 4;
                         stack.Push(currentSnapshot);
@@ -885,7 +894,10 @@ namespace EpPathFinding3D.cs
                         break;
                     case 4:
                         if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
                             continue;
+                        }
 
                         currentSnapshot.stage = 5;
                         stack.Push(currentSnapshot);
@@ -902,8 +914,10 @@ namespace EpPathFinding3D.cs
                         break;
                     case 5:
                         if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
                             continue;
-
+                        }
                         currentSnapshot.stage = 9;
                         stack.Push(currentSnapshot);
 
@@ -919,7 +933,10 @@ namespace EpPathFinding3D.cs
                         break;
                     case 6:
                         if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
                             continue;
+                        }
 
                         currentSnapshot.stage = 9;
                         stack.Push(currentSnapshot);
@@ -936,7 +953,10 @@ namespace EpPathFinding3D.cs
                         break;
                     case 7:
                         if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
                             continue;
+                        }
 
                         currentSnapshot.stage = 9;
                         stack.Push(currentSnapshot);
@@ -953,7 +973,10 @@ namespace EpPathFinding3D.cs
                         break;
                     case 8:
                         if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
                             continue;
+                        }
 
                         currentSnapshot.stage = 9;
                         stack.Push(currentSnapshot);
@@ -971,7 +994,10 @@ namespace EpPathFinding3D.cs
 
                     case 9:
                         if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
                             continue;
+                        }
 
                         // when moving diagonally, must check for vertical/horizontal jump points
                         // neighbors is open to allow the path
@@ -1012,7 +1038,10 @@ namespace EpPathFinding3D.cs
 
                     case 10:
                         if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
                             continue;
+                        }
 
                         currentSnapshot.stage = 11;
                         stack.Push(currentSnapshot);
@@ -1030,7 +1059,10 @@ namespace EpPathFinding3D.cs
                     case 11:
 
                         if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
                             continue;
+                        }
 
                         currentSnapshot.stage = 12;
                         stack.Push(currentSnapshot);
@@ -1047,7 +1079,10 @@ namespace EpPathFinding3D.cs
                         break;
                     case 12:
                         if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
                             continue;
+                        }
 
                         currentSnapshot.stage = 13;
                         stack.Push(currentSnapshot);
@@ -1064,7 +1099,10 @@ namespace EpPathFinding3D.cs
                         break;
                     case 13:
                         if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
                             continue;
+                        }
 
                         currentSnapshot.stage = 14;
                         stack.Push(currentSnapshot);
@@ -1081,7 +1119,10 @@ namespace EpPathFinding3D.cs
                         break;
                     case 14:
                         if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
                             continue;
+                        }
 
                         currentSnapshot.stage = 18;
                         stack.Push(currentSnapshot);
@@ -1098,8 +1139,10 @@ namespace EpPathFinding3D.cs
                         break;
                     case 15:
                         if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
                             continue;
-
+                        }
                         currentSnapshot.stage = 18;
                         stack.Push(currentSnapshot);
 
@@ -1115,7 +1158,10 @@ namespace EpPathFinding3D.cs
                         break;
                     case 16:
                         if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
                             continue;
+                        }
 
                         currentSnapshot.stage = 18;
                         stack.Push(currentSnapshot);
@@ -1132,7 +1178,10 @@ namespace EpPathFinding3D.cs
                         break;
                     case 17:
                         if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
                             continue;
+                        }
 
                         currentSnapshot.stage = 18;
                         stack.Push(currentSnapshot);
@@ -1151,7 +1200,10 @@ namespace EpPathFinding3D.cs
 
                     case 18:
                         if (retVal != null)
+                        {
+                            retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
                             continue;
+                        }
 
                         // moving diagonally, must make sure both of the vertical/horizontal
                         // neighbors is open to allow the path
@@ -1178,7 +1230,7 @@ namespace EpPathFinding3D.cs
                             retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY, currentSnapshot.iZ);
                             continue;
                         }
-                        currentSnapshot.stage =20;
+                        currentSnapshot.stage = 20;
                         stack.Push(currentSnapshot);
 
                         newSnapshot = new JumpSnapshot();
