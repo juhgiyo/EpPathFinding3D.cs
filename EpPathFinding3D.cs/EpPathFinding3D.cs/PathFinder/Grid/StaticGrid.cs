@@ -94,7 +94,7 @@ namespace EpPathFinding3D.cs
             for (int widthTrav = 0; widthTrav < iWidth; widthTrav++)
             {
                 tNodes[widthTrav] = new Node[iLength][];
-                for (int lengthTrav = 0; lengthTrav < iHeight; lengthTrav++)
+                for (int lengthTrav = 0; lengthTrav < iLength; lengthTrav++)
                 {
                     tNodes[widthTrav][lengthTrav] = new Node[iHeight];
                     for (int heightTrav = 0; heightTrav < iHeight; heightTrav++)
@@ -118,7 +118,7 @@ namespace EpPathFinding3D.cs
 
             for (int widthTrav = 0; widthTrav < iWidth; widthTrav++)
             {
-                for (int lengthTrav = 0; lengthTrav < iHeight; lengthTrav++)
+                for (int lengthTrav = 0; lengthTrav < iLength; lengthTrav++)
                 {
                     for (int heightTrav = 0; heightTrav < iHeight; heightTrav++)
                     {

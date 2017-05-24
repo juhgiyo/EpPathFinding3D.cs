@@ -1,0 +1,13 @@
+﻿<Properties StartupItem="EpPathFinding3D.cs.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="PathFinder\DiagonalMovement.cs">
+    <Files>
+      <File FileName="PathFinder\AStarFinder.cs" Line="1" Column="1" />
+      <File FileName="PathFinder\DiagonalMovement.cs" Line="1" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
