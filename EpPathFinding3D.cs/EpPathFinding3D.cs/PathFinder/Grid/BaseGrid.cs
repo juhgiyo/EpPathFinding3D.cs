@@ -373,26 +373,26 @@ namespace EpPathFinding3D.cs
                     break;
                 case DiagonalMovement.IfAtLeastOneWalkable:
                     tSU0 = tS0 || tS4;
-                    tSU1 = tS3 || tS4;
-                    tSU2 = tS1 || tS4;
-                    tSU3 = tS2 || tS4;
+                    tSU1 = tS1 || tS4;
+                    tSU2 = tS2 || tS4;
+                    tSU3 = tS3 || tS4;
 
                     tSD0 = tS0 || tS4;
-                    tSD1 = tS3 || tS4;
-                    tSD2 = tS1 || tS4;
-                    tSD3 = tS2 || tS4;
+                    tSD1 = tS1 || tS4;
+                    tSD2 = tS2 || tS4;
+                    tSD3 = tS3 || tS4;
 
                     break;
                 case DiagonalMovement.OnlyWhenNoObstacles:
                     tSU0 = tS0 && tS4;
-                    tSU1 = tS3 && tS4;
-                    tSU2 = tS1 && tS4;
-                    tSU3 = tS2 && tS4;
+                    tSU1 = tS1 && tS4;
+                    tSU2 = tS2 && tS4;
+                    tSU3 = tS3 && tS4;
 
                     tSD0 = tS0 && tS4;
-                    tSD1 = tS3 && tS4;
-                    tSD2 = tS1 && tS4;
-                    tSD3 = tS2 && tS4;
+                    tSD1 = tS1 && tS4;
+                    tSD2 = tS2 && tS4;
+                    tSD3 = tS3 && tS4;
                     break;
                 default:
                     break;
