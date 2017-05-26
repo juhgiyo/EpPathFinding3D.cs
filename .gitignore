@@ -3,3 +3,15 @@ Debug/
 Release/
 *.suo
 packages/
+
+EpPathFinder3DDemo/*.csproj
+EpPathFinder3DDemo/*.unityproj
+EpPathFinder3DDemo/*.sln
+EpPathFinder3DDemo/*.user
+EpPathFinder3DDemo/*.userprefs
+EpPathFinder3DDemo/*.DS_store
+
+EpPathFinder3DDemo/Temp/
+EpPathFinder3DDemo/Library/
+EpPathFinder3DDemo/obj/
+EpPathFinder3DDemo/.vs
