@@ -129,5 +129,10 @@ namespace EpPathFinding3D.cs
             this.z = iZ;
             return this;
         }
+
+        public override string ToString()
+        {
+            return string.Format("({0},{1},{2})", x, y, z);
+        }
     }
 }

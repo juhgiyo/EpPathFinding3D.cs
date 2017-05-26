@@ -10,13 +10,12 @@ public class MainController : MonoBehaviour {
 	
 	//UI	
 	public Dropdown m_ddDiagonalMode;
-    public Toggle m_tRecursive;
+    public Toggle m_tRecursive, m_tOpenedCell, m_tTotalMap;    
     
     //cube & line
     public GameObject m_cube;
     public Dictionary<int, GameObject> m_cubeMap;
     public List<Testbed> m_testbedList = new List<Testbed>();
-    bool m_isSearched = false;
 
     string m_map;
     string m_startend;
@@ -25,15 +24,13 @@ public class MainController : MonoBehaviour {
     public JumpPointParam m_jumpParam;
 
     //colors
-    public Color m_basic = new Color(0.2f, 0.2f, 0.2f, 0.0f); //invisible
-
-    public Color m_start = new Color(Color.green.r, Color.green.g, Color.green.b, 1.0f);
-    public Color m_end = new Color(Color.red.r, Color.red.g, Color.red.b, 1.0f);
-
-    public Color m_open = new Color(Color.blue.r, Color.blue.g, Color.blue.b, 0.5f);
-    public Color m_close = new Color(Color.cyan.r, Color.cyan.g, Color.cyan.b, 0.5f);
-
-    public Color m_unwalkable = new Color(Color.black.r, Color.black.g, Color.black.b, 1.0f);
+    Color m_hidden;
+    Color m_basic;
+    Color m_start;
+    Color m_end;
+    Color m_open;
+    Color m_close;
+    Color m_unwalkable;
     
     //cube methods
     private void buildCubes(int x, int y, int z)
@@ -86,42 +83,57 @@ public class MainController : MonoBehaviour {
 
 		return newline;
 	}
-	private List<GameObject> drawTrace(List<GridPos> trace)
-	{
-		GridPos start = new GridPos(), end;
-		List<GameObject> result = new List<GameObject>();
-        
-		for(int i=0; i<trace.Count; i++)
+    private void drawTrace(Testbed tb)
+	{        
+		GridPos start = new GridPos(), end;		
+        tb.pTrace.name = string.Format("Trace_{0}-{1}", tb.start.ToString(), tb.end.ToString());
+		for(int i=0; i<tb.result.Count; i++)
 		{
-            GameObject lines = new GameObject();
-            lines.name = string.Format("Trace_{0}", i);
-            if (i==0) start = trace[i];
-			else
-			{
-				end = trace[i];
-				GameObject newline = drawLine(start,end);
-                newline.transform.parent = lines.transform;
-                result.Add(newline);
+            if (i == 0) start = tb.result[i];
+            else
+            {
+                end = tb.result[i];
+                GameObject newline = drawLine(start, end);
+                newline.transform.parent = tb.pTrace.transform;
+                tb.trace.Add(newline);
                 start = end;
-			}
-		}
-		return result;
+            }
+		}	
 	}
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
+
+        m_hidden = new Color(1.0f, 1.0f, 1.0f, 0.0f); //invisible
+        m_basic = new Color(1.0f, 1.0f, 1.0f, 0.03f); //visible
+
+        m_start = new Color(Color.green.r, Color.green.g, Color.green.b, 1.0f);
+        m_end = new Color(Color.red.r, Color.red.g, Color.red.b, 1.0f);
+        m_open = new Color(Color.blue.r, Color.blue.g, Color.blue.b, 0.3f);
+        m_close = new Color(Color.cyan.r, Color.cyan.g, Color.cyan.b, 0.3f);
+
+        m_unwalkable = new Color(Color.black.r, Color.black.g, Color.black.b, 1.0f);
+
+
         //// UI ////
-		//loading & mapping
-		m_cube = Resources.Load("Prefabs/Cube") as GameObject;
+        //loading & mapping
+        m_cube = Resources.Load("Prefabs/Cube") as GameObject;
 		GameObject.Find ("Canvas/btnClear").GetComponent<Button>().onClick.AddListener(OnbtnClearClicked);
 		GameObject.Find ("Canvas/btnSearch").GetComponent<Button>().onClick.AddListener(OnbtnSearchClicked);
 		GameObject.Find ("Canvas/btnLoadMap").GetComponent<Button>().onClick.AddListener(OnbtnLoadMapClicked);
 		GameObject.Find("Canvas/btnLoadStartEnd").GetComponent<Button>().onClick.AddListener(OnbtnLoadStartEndClicked);
 		m_ddDiagonalMode = GameObject.Find ("Canvas/DropdownMode").GetComponent<Dropdown>();
 		m_tRecursive = GameObject.Find("Canvas/ToggleRecursive").GetComponent<Toggle>();
-        
+        m_tOpenedCell = GameObject.Find("Canvas/ToggleOpenedCell").GetComponent<Toggle>();
+        m_tTotalMap = GameObject.Find("Canvas/ToggleTotalMap").GetComponent<Toggle>();
+
+        m_tOpenedCell.onValueChanged.AddListener((value) => { OntOpenedCellValue(value); });
+        m_tTotalMap.onValueChanged.AddListener((value) => { OntTotalMapValue(value); });
+
+
+
         ////cube setup////
-		m_cubeMap = new Dictionary<int,GameObject>();
+        m_cubeMap = new Dictionary<int,GameObject>();
         int width = 10, length = 10, height = 10;
         buildCubes(width, length, height);
 
@@ -161,98 +173,104 @@ public class MainController : MonoBehaviour {
         {
 			m_jumpParam.Reset(i.start, i.end);
 			i.result = JumpPointFinder.FindPath(m_jumpParam);
+            getOpenClose(i);
 			drawResult(i);
         }
     }
+    private void getOpenClose(Testbed tb)
+    {
+        for(int x=0; x<m_jumpParam.SearchGrid.width; x++)
+        {
+            for(int y=0; y<m_jumpParam.SearchGrid.length; y++)
+            {
+                for(int z=0; z<m_jumpParam.SearchGrid.height; z++)
+                {                    
+                    GridPos curPos = new GridPos(x, y, z);
+                    Node curNode = m_jumpParam.SearchGrid.GetNodeAt(curPos);
+                    if (curPos != tb.start && curPos != tb.end)
+                    {
+                        if (curNode.isOpened) tb.opened.Add(curPos);
+                        else if (curNode.isClosed) tb.closed.Add(curPos);
+                    }
+                }
+            }
+        }            
+    }
     private void drawResult(Testbed tb)
     {		
-		tb.trace = drawTrace(tb.result);
-        markOpenClose(tb);
+		drawTrace(tb);
+        if(m_tOpenedCell.isOn) markOpenClose(tb);        
     }
     private void clearResult()
     {
-        //clean the result of pathfinding method
-        //open/close cells and traces
+        foreach (Testbed tb in m_testbedList)
+        {
+            clearOpenClose(tb);
+            foreach (GameObject line in tb.trace)
+                Destroy(line);
+            tb.opened.Clear();
+            tb.closed.Clear();
+            tb.trace.Clear();
+        }
+        markAllStartEnd(); //sometimes, start/end cubes are gone (by other path's open/closed mark)
+    }
+    
+    void showBasicCube()
+    {
         foreach (GameObject cube in m_cubeMap.Values)
         {
             Color curColor = cube.GetComponent<MeshRenderer>().material.color;
-            if (curColor == m_open || curColor == m_close)
-            {
+            if (curColor == m_hidden)
                 cube.GetComponent<MeshRenderer>().material.color = m_basic;
-            }
         }
-        foreach (Testbed tb in m_testbedList)
+    }
+    void hideBasicCube()
+    {
+        foreach (GameObject cube in m_cubeMap.Values)
         {
-            foreach (GameObject line in tb.trace)
-            {
-                Destroy(line);
-            }
+            Color curColor = cube.GetComponent<MeshRenderer>().material.color;
+            if (curColor == m_basic)
+                cube.GetComponent<MeshRenderer>().material.color = m_hidden;
         }
     }
     private void markOpenClose(Testbed tb)
     {        
-        for (int widthTrav = 0; widthTrav < m_jumpParam.SearchGrid.width; widthTrav++)
-        {
-            for (int lengthTrav = 0; lengthTrav < m_jumpParam.SearchGrid.length; lengthTrav++)
-            {
-                for (int heightTrav = 0; heightTrav < m_jumpParam.SearchGrid.height; heightTrav++)
-                {
-                    if (m_jumpParam.SearchGrid.GetNodeAt(widthTrav, lengthTrav, heightTrav) == null)
-                        continue;
-                    if (m_jumpParam.SearchGrid.GetNodeAt(widthTrav, lengthTrav, heightTrav).isClosed)
-                    {
-                        // Closed Node
-                        GridPos curPos = new GridPos(widthTrav, lengthTrav, heightTrav);
-                        if (curPos != tb.start && curPos != tb.end)
-                            setCubeColor(curPos, m_close);
-                    }
-                    if (m_jumpParam.SearchGrid.GetNodeAt(widthTrav, lengthTrav, heightTrav).isOpened)
-                    {
-                        // Opened Node
-                        GridPos curPos = new GridPos(widthTrav, lengthTrav, heightTrav);
-                        if (curPos != tb.start && curPos != tb.end)
-                            setCubeColor(curPos, m_open);
-                    }
-
-                }
-            }
-        }
-    }   
-    void drawMap()
+        foreach(GridPos pos in tb.opened)
+            setCubeColor(pos, m_open);
+        foreach (GridPos pos in tb.closed)
+            setCubeColor(pos, m_close);
+    }
+    private void clearOpenClose(Testbed tb)
     {
-        Debug.Log(m_map);
-        string[] cubes = m_map.Split('\n');        
-        foreach (string cube in cubes)
+        foreach (GridPos cube in tb.opened)
         {
-            string[] pos = cube.Split(',');
-            int x = int.Parse(pos[0]);
-            int y = int.Parse(pos[1]);
-            int z = int.Parse(pos[2]);
-            GridPos target = new GridPos(x, y, z);
-            m_jumpParam.SearchGrid.SetWalkableAt(target, false);
-            setCubeColor(target, Color.black);
+            if (m_tTotalMap.isOn) setCubeColor(cube, m_basic);
+            else setCubeColor(cube, m_hidden);
         }
-    }	
-    private void clearMap()
-    {
-        //all convert to walkable
-        for (int widthTrav = 0; widthTrav < m_jumpParam.SearchGrid.width; widthTrav++)
+        foreach (GridPos cube in tb.closed)
         {
-            for (int lengthTrav = 0; lengthTrav < m_jumpParam.SearchGrid.length; lengthTrav++)
-            {
-                for (int heightTrav = 0; heightTrav < m_jumpParam.SearchGrid.height; heightTrav++)
-                {
-                    GridPos curPos = new GridPos(widthTrav, lengthTrav, heightTrav);
-                    if (!m_jumpParam.SearchGrid.IsWalkableAt(curPos))
-                    {
-                        m_jumpParam.SearchGrid.SetWalkableAt(curPos, true);
-                        setCubeColor(curPos, m_basic);
-                    }
-                }
-            }
+            if (m_tTotalMap.isOn) setCubeColor(cube, m_basic);
+            else setCubeColor(cube, m_hidden);
         }
     }
 
+    
+
+    void OntOpenedCellValue(bool isOn)
+    {
+        if (isOn)
+            foreach (Testbed tb in m_testbedList)
+                markOpenClose(tb);
+        else
+            foreach (Testbed tb in m_testbedList)
+                clearOpenClose(tb);
+        markAllStartEnd(); //sometimes, start/end cubes are gone (by other path's open/closed mark)
+    }
+    void OntTotalMapValue(bool isOn)
+    {
+        if (isOn) showBasicCube();
+        else hideBasicCube();
+    }
 
     void OnbtnClearClicked()
     {
@@ -275,11 +293,47 @@ public class MainController : MonoBehaviour {
             drawMap();
         });
     }
+    void drawMap()
+    {
+        clearResult();
+        string[] cubes = m_map.Split('\n');
+        foreach (string cube in cubes)
+        {
+            string[] pos = cube.Split(',');
+            int x = int.Parse(pos[0]);
+            int y = int.Parse(pos[1]);
+            int z = int.Parse(pos[2]);
+            GridPos target = new GridPos(x, y, z);
+            m_jumpParam.SearchGrid.SetWalkableAt(target, false);
+            setCubeColor(target, Color.black);
+        }
+    }
+    private void clearMap()
+    {
+        //all convert to walkable
+        for (int widthTrav = 0; widthTrav < m_jumpParam.SearchGrid.width; widthTrav++)
+        {
+            for (int lengthTrav = 0; lengthTrav < m_jumpParam.SearchGrid.length; lengthTrav++)
+            {
+                for (int heightTrav = 0; heightTrav < m_jumpParam.SearchGrid.height; heightTrav++)
+                {
+                    GridPos curPos = new GridPos(widthTrav, lengthTrav, heightTrav);
+                    if (!m_jumpParam.SearchGrid.IsWalkableAt(curPos))
+                    {
+                        m_jumpParam.SearchGrid.SetWalkableAt(curPos, true);
+                        setCubeColor(curPos, m_basic);
+                    }
+                }
+            }
+        }
+    }
+
     void OnbtnLoadStartEndClicked()
     {
         Debug.Log("LoadStratEnd button Clicked");
         //clear previous startend set
-        foreach(Testbed tb in m_testbedList)
+        clearResult();
+        foreach (Testbed tb in m_testbedList)
         {
             setCubeColor(tb.start, m_basic);
             setCubeColor(tb.end, m_basic);
@@ -298,10 +352,17 @@ public class MainController : MonoBehaviour {
                 GridPos start = new GridPos(int.Parse(startPosString[0]), int.Parse(startPosString[1]), int.Parse(startPosString[2]));
                 string[] endPosString = poses[1].Split(',');
                 GridPos end = new GridPos(int.Parse(endPosString[0]), int.Parse(endPosString[1]), int.Parse(endPosString[2]));
-                m_testbedList.Add(new Testbed(start, end));
-                setCubeColor(start, m_start);
-                setCubeColor(end, m_end);
+                m_testbedList.Add(new Testbed(start, end));                
             }
+            markAllStartEnd();
         });
+    }
+    void markAllStartEnd()
+    {
+        foreach(Testbed tb in m_testbedList)
+        {
+            setCubeColor(tb.start, m_start);
+            setCubeColor(tb.end, m_end);
+        }
     }
 }
