@@ -1870,7 +1870,7 @@ namespace EpPathFinding3D.cs
                         }
                         if (iParam.SearchGrid.IsWalkableAt(tX, tY, tZ + tDz))
                         {
-                            tNeighbors.Add(new GridPos(tX + tDx, tY, tZ + tDz));
+                            tNeighbors.Add(new GridPos(tX, tY, tZ + tDz));
                         }
 
                         // X && Y Dimension
@@ -3024,7 +3024,7 @@ namespace EpPathFinding3D.cs
                         }
                         if (iParam.SearchGrid.IsWalkableAt(tX, tY, tZ + tDz))
                         {
-                            tNeighbors.Add(new GridPos(tX + tDx, tY, tZ + tDz));
+                            tNeighbors.Add(new GridPos(tX, tY, tZ + tDz));
                         }
 
                         // X && Y Dimension
