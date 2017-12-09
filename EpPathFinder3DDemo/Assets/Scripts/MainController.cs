@@ -158,7 +158,7 @@ public class MainController : MonoBehaviour {
 			}
 		}
         BaseGrid searchGrid = new StaticGrid(width, length, height, movableMatrix);
-		m_jumpParam = new JumpPointParam(searchGrid, new GridPos(), new GridPos(), true,0);                
+		m_jumpParam = new JumpPointParam(searchGrid, new GridPos(), new GridPos(), EndNodeUnWalkableTreatment.ALLOW,DiagonalMovement.Always);                
 	}
 	// Update is called once per frame
 	void Update ()
@@ -167,7 +167,7 @@ public class MainController : MonoBehaviour {
 
     private void findPath()
     {
-		m_jumpParam.UseRecursive = m_tRecursive.isOn;
+        m_jumpParam.CurIterationType = m_tRecursive.isOn ? IterationType.RECURSIVE : IterationType.LOOP;
 		m_jumpParam.DiagonalMovement = (DiagonalMovement)m_ddDiagonalMode.value;
 		foreach (Testbed i in m_testbedList)
         {

@@ -125,7 +125,6 @@ namespace EpPathFinding3D.cs
 #if (!UNITY)
 );
 #endif
-                if (openList.Count == 0) return Node.Backtrace(node);
             }
             return new List<GridPos>();
 
