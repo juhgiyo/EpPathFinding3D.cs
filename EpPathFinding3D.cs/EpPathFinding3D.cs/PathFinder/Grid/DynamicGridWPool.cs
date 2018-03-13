@@ -53,7 +53,7 @@ namespace EpPathFinding3D.cs
             {
                 if (m_notSet)
                     setBoundingBox();
-                return m_gridRect.maxX - m_gridRect.minX;
+                return m_gridRect.maxX - m_gridRect.minX + 1;
             }
             protected set
             {
@@ -67,7 +67,7 @@ namespace EpPathFinding3D.cs
             {
                 if (m_notSet)
                     setBoundingBox();
-                return m_gridRect.maxY - m_gridRect.minY;
+                return m_gridRect.maxY - m_gridRect.minY + 1;
             }
             protected set
             {
@@ -80,7 +80,7 @@ namespace EpPathFinding3D.cs
             {
                 if (m_notSet)
                     setBoundingBox();
-                return m_gridRect.maxZ - m_gridRect.minZ;
+                return m_gridRect.maxZ - m_gridRect.minZ + 1;
             }
             protected set
             {
