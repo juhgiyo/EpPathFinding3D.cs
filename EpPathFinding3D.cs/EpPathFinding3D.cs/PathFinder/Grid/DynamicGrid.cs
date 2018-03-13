@@ -184,7 +184,7 @@ namespace EpPathFinding3D.cs
                     if (iZ > m_gridRect.maxZ || m_notSet)
                         m_gridRect.maxZ = iZ;
                     m_nodes.Add(new GridPos(pos.x, pos.y, pos.z), new Node(pos.x, pos.y, pos.z, iWalkable));
-                    m_notSet = false;
+                    //m_notSet = false;
                 }
             }
             else
